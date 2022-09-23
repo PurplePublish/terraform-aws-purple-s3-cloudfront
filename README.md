@@ -1,9 +1,8 @@
 # Purple Cloudfront Terraform module
 
-This module sets up a S3 bucket and Cloudfront distribution suitable for content distribution with Purple DS
+This module sets up a S3 bucket and Cloudfront distribution suitable for content distribution with [Purple](https://purplepublish.com).
 
-It optionally support a custom domain setup for Cloudfront, e.g. cdn.example.com, and will, optionally, 
-configure a suitable certificate using AWS ACM.
+It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.com, and configures a suitable certificate using AWS ACM.
 
 ## Bucket configuration
 
@@ -14,8 +13,8 @@ configure a suitable certificate using AWS ACM.
 
 * Default access using signed URLs
 * Following paths are publicly accessible:
-  * \*/thumbnails/\*
-  * /public/\*
+    * \*/thumbnails/\*
+    * /public/\*
 
 ## Migration from manual setup
 
