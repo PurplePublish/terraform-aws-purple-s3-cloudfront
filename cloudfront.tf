@@ -5,8 +5,8 @@ locals {
     cached_methods           = ["GET", "HEAD"]
     compress                 = true
     use_forwarded_values     = false
-    cache_policy_id          = data.aws_cloudfront_cache_policy.s3.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.cors.id
+    cache_policy_id          = aws_cloudfront_cache_policy.s3.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.s3.id
 
     lambda_function_association = {
       "origin-request" = {
@@ -17,12 +17,35 @@ locals {
   }
 }
 
-data "aws_cloudfront_origin_request_policy" "cors" {
-  name = "Managed-CORS-S3Origin"
+resource "aws_cloudfront_origin_request_policy" "s3" {
+  name = "Purple-${var.bucket_name}"
+  cookies_config {
+    cookie_behavior = "none"
+  }
+  headers_config {
+    header_behavior = "none"
+  }
+  query_strings_config {
+    query_string_behavior = "all"
+  }
 }
 
-data "aws_cloudfront_cache_policy" "s3" {
-  name = "Managed-CachingOptimized"
+resource "aws_cloudfront_cache_policy" "s3" {
+  name        = "Purple-${var.bucket_name}"
+  min_ttl     = 1
+  max_ttl     = 31536000
+  default_ttl = 86400
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+  }
 }
 
 module "cloudfront" {
