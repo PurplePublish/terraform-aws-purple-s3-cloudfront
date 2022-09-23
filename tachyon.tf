@@ -40,6 +40,7 @@ module "tachyon" {
   timeout                           = 30
   memory_size                       = 256
   lambda_at_edge                    = true
+  publish                           = true
   create_package                    = false
   local_existing_package            = "${path.module}/tachyon/tachyon-r32.zip"
   cloudwatch_logs_retention_in_days = 30
