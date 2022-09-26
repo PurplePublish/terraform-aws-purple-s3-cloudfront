@@ -1,12 +1,13 @@
 locals {
   behavior_defaults = {
-    viewer_protocol_policy   = "allow-all"
-    allowed_methods          = ["GET", "HEAD", "OPTIONS"]
-    cached_methods           = ["GET", "HEAD"]
-    compress                 = true
-    use_forwarded_values     = false
-    cache_policy_id          = aws_cloudfront_cache_policy.s3.id
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.s3.id
+    viewer_protocol_policy     = "allow-all"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    use_forwarded_values       = false
+    cache_policy_id            = aws_cloudfront_cache_policy.s3.id
+    origin_request_policy_id   = aws_cloudfront_origin_request_policy.s3.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.s3.id
 
     lambda_function_association = {
       "origin-request" = {
@@ -44,6 +45,23 @@ resource "aws_cloudfront_cache_policy" "s3" {
     }
     query_strings_config {
       query_string_behavior = "all"
+    }
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "s3" {
+  name = "Purple-${var.bucket_name}"
+  cors_config {
+    access_control_allow_credentials = false
+    origin_override                  = true
+    access_control_allow_headers {
+      items = ["*"]
+    }
+    access_control_allow_methods {
+      items = ["POST", "GET", "HEAD", "PATCH", "DELETE", "OPTIONS", "PUT"]
+    }
+    access_control_allow_origins {
+      items = var.cloudfront_cors_allow_origins != null ? var.cloudfront_cors_allow_origins : ["*"]
     }
   }
 }
