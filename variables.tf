@@ -27,7 +27,7 @@ variable "cloudfront_price_class" {
 
 variable "cloudfront_domain" {
   type    = string
-  default = null
+  default = ""
 }
 
 variable "cloudfront_minimum_protocol_version" {

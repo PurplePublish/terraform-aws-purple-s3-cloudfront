@@ -5,7 +5,7 @@ module "acm" {
     aws = aws.us-east-1
   }
 
-  create_certificate   = var.cloudfront_domain != null && var.manage_certificate
+  create_certificate   = var.cloudfront_domain != "" && var.manage_certificate
   domain_name          = var.cloudfront_domain
   zone_id              = var.acm_zone_id
   validate_certificate = true

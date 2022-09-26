@@ -53,13 +53,13 @@ module "cloudfront" {
   version = ">= 3.0.0"
 
   # Metadata
-  comment = try(var.cloudfront_comment, var.cloudfront_domain != null ? "Cloudfront for ${var.cloudfront_domain}" : null)
+  comment = try(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : null)
 
   # Basic settings
   http_version    = "http2and3"
   is_ipv6_enabled = true
   price_class     = var.cloudfront_price_class
-  aliases         = [var.cloudfront_domain]
+  aliases         = var.cloudfront_domain != "" ? [var.cloudfront_domain] : null
 
   create_origin_access_identity = true
   origin_access_identities = {
@@ -102,7 +102,7 @@ module "cloudfront" {
     })
   ]
 
-  viewer_certificate = var.cloudfront_domain != null ? {
+  viewer_certificate = var.cloudfront_domain != "" ? {
     acm_certificate_arn      = var.manage_certificate ? module.acm.acm_certificate_arn : var.acm_certificate_arn
     minimum_protocol_version = var.cloudfront_minimum_protocol_version
     ssl_support_method       = "sni-only"
