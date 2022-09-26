@@ -1,5 +1,5 @@
 module "acm" {
-  source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
+  source  = "terraform-aws-modules/acm/aws"
   version = ">= 4.1.0"
   providers = {
     aws = aws.us-east-1
