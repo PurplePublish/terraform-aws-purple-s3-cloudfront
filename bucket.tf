@@ -24,15 +24,6 @@ module "bucket" {
                     "AWS:SourceArn": "${module.cloudfront.cloudfront_distribution_arn}"
                 }
             }
-        },
-        {
-            "Sid": "AllowLegacyOAIReadOnly",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "${module.cloudfront.cloudfront_origin_access_identities[var.bucket_name].iam_arn}"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::${var.bucket_name}/*"
         }
     ]
 }

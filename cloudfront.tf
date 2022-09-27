@@ -81,6 +81,14 @@ resource "aws_cloudfront_key_group" "default" {
   items   = [aws_cloudfront_public_key.purple.id]
 }
 
+resource "aws_cloudfront_origin_access_control" "default" {
+  name                              = var.bucket_name
+  description                       = "Origin access control policy for ${var.bucket_name}"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = ">= 3.0.0"
@@ -94,18 +102,11 @@ module "cloudfront" {
   price_class     = var.cloudfront_price_class
   aliases         = var.cloudfront_domain != "" ? [var.cloudfront_domain] : null
 
-  create_origin_access_identity = true
-  origin_access_identities = {
-    (var.bucket_name) = "Origin Access Identity for Bucket ${var.bucket_name}"
-  }
-
   # Origins
   origin = {
     "S3-${var.bucket_name}" = {
-      domain_name = module.bucket.s3_bucket_bucket_regional_domain_name
-      s3_origin_config = {
-        origin_access_identity = var.bucket_name
-      }
+      domain_name              = module.bucket.s3_bucket_bucket_regional_domain_name
+      origin_access_control_id = aws_cloudfront_origin_access_control.default.id
       custom_header = {
         region = {
           name  = "X-AWS-S3-REGION"
