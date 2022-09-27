@@ -70,6 +70,9 @@ resource "aws_cloudfront_public_key" "purple" {
   name_prefix = "${var.bucket_name}-"
   comment     = "Public key of Purple DS"
   encoded_key = file("${path.module}/cloudfront/purple-public.pem")
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_cloudfront_key_group" "default" {
