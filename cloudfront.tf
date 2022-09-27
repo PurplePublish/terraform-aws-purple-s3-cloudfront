@@ -66,6 +66,18 @@ resource "aws_cloudfront_response_headers_policy" "s3" {
   }
 }
 
+resource "aws_cloudfront_public_key" "purple" {
+  name_prefix = "purple-${var.bucket_name}"
+  comment     = "Public key of Purple DS"
+  encoded_key = file("${path.module}/cloudfront/purple-public.pem")
+}
+
+resource "aws_cloudfront_key_group" "default" {
+  name    = "purple-${var.bucket_name}"
+  comment = "Public keys for ${var.bucket_name}"
+  items   = [aws_cloudfront_public_key.purple.id]
+}
+
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = ">= 3.0.0"
@@ -107,7 +119,7 @@ module "cloudfront" {
   default_cache_behavior = merge(local.behavior_defaults, {
     target_origin_id = "S3-${var.bucket_name}"
 
-    trusted_signers = [for account_id in concat(["self"], var.cloudfront_trusted_signers) : account_id if account_id != data.aws_caller_identity.current.account_id]
+    trusted_key_groups = [aws_cloudfront_key_group.default.id]
   })
   ordered_cache_behavior = [
     merge(local.behavior_defaults, {
