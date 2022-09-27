@@ -119,6 +119,7 @@ module "cloudfront" {
   default_cache_behavior = merge(local.behavior_defaults, {
     target_origin_id = "S3-${var.bucket_name}"
 
+    trusted_signers    = null
     trusted_key_groups = [aws_cloudfront_key_group.default.id]
   })
   ordered_cache_behavior = [
