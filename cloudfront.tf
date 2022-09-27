@@ -46,6 +46,8 @@ resource "aws_cloudfront_cache_policy" "s3" {
     query_strings_config {
       query_string_behavior = "all"
     }
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
   }
 }
 
@@ -58,12 +60,13 @@ resource "aws_cloudfront_response_headers_policy" "s3" {
       items = ["*"]
     }
     access_control_allow_methods {
-      items = ["POST", "GET", "HEAD", "PATCH", "DELETE", "OPTIONS", "PUT"]
+      items = ["ALL"]
     }
     access_control_allow_origins {
       items = var.cloudfront_cors_allow_origins != null ? var.cloudfront_cors_allow_origins : ["*"]
     }
   }
+  security_headers_config {}
 }
 
 resource "aws_cloudfront_public_key" "purple" {
@@ -128,11 +131,11 @@ module "cloudfront" {
   })
   ordered_cache_behavior = [
     merge(local.behavior_defaults, {
-      path_pattern     = "*/thumbnails/*"
+      path_pattern     = "public/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
     merge(local.behavior_defaults, {
-      path_pattern     = "public/*"
+      path_pattern     = "*/thumbnails/*"
       target_origin_id = "S3-${var.bucket_name}"
     })
   ]
