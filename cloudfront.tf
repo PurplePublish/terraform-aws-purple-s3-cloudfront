@@ -67,13 +67,13 @@ resource "aws_cloudfront_response_headers_policy" "s3" {
 }
 
 resource "aws_cloudfront_public_key" "purple" {
-  name_prefix = "purple-${var.bucket_name}"
+  name_prefix = "${var.bucket_name}-"
   comment     = "Public key of Purple DS"
   encoded_key = file("${path.module}/cloudfront/purple-public.pem")
 }
 
 resource "aws_cloudfront_key_group" "default" {
-  name    = "purple-${var.bucket_name}"
+  name    = var.bucket_name
   comment = "Public keys for ${var.bucket_name}"
   items   = [aws_cloudfront_public_key.purple.id]
 }
