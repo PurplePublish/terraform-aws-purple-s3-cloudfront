@@ -19,7 +19,7 @@ locals {
 }
 
 resource "aws_cloudfront_origin_request_policy" "s3" {
-  name = "Purple-${var.bucket_name}"
+  name = var.bucket_name
   cookies_config {
     cookie_behavior = "none"
   }
@@ -32,7 +32,7 @@ resource "aws_cloudfront_origin_request_policy" "s3" {
 }
 
 resource "aws_cloudfront_cache_policy" "s3" {
-  name        = "Purple-${var.bucket_name}"
+  name        = var.bucket_name
   min_ttl     = 1
   max_ttl     = 31536000
   default_ttl = 86400
@@ -50,7 +50,7 @@ resource "aws_cloudfront_cache_policy" "s3" {
 }
 
 resource "aws_cloudfront_response_headers_policy" "s3" {
-  name = "Purple-${var.bucket_name}"
+  name = var.bucket_name
   cors_config {
     access_control_allow_credentials = false
     origin_override                  = true
