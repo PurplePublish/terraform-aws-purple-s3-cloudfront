@@ -66,7 +66,6 @@ resource "aws_cloudfront_response_headers_policy" "s3" {
       items = var.cloudfront_cors_allow_origins != null ? var.cloudfront_cors_allow_origins : ["*"]
     }
   }
-  security_headers_config {}
 }
 
 resource "aws_cloudfront_public_key" "purple" {
