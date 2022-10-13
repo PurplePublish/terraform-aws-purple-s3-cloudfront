@@ -96,7 +96,7 @@ module "cloudfront" {
   version = ">= 3.0.0"
 
   # Metadata
-  comment = try(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : null)
+  comment = coalesce(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : "Cloudfront for ${var.bucket_name}")
 
   # Basic settings
   http_version    = "http2and3"
