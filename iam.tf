@@ -1,5 +1,5 @@
 resource "aws_iam_user" "default" {
-  name = try(var.bucket_iam_user_name, var.bucket_name)
+  name = coalesce(var.bucket_iam_user_name, var.bucket_name)
 }
 
 resource "aws_iam_access_key" "default" {
