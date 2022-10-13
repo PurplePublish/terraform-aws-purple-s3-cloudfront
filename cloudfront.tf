@@ -145,6 +145,5 @@ module "cloudfront" {
     ssl_support_method       = "sni-only"
     } : {
     cloudfront_default_certificate = true
-    minimum_protocol_version       = var.cloudfront_minimum_protocol_version
   }
 }

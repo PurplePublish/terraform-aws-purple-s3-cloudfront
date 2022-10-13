@@ -16,6 +16,15 @@ resource "aws_iam_policy" "bucket" {
     {
         "Effect": "Allow",
         "Action": [
+            "polly:*"
+        ],
+        "Resource": [
+            "*"
+        ]
+    },
+    {
+        "Effect": "Allow",
+        "Action": [
             "s3:ListBucket"
         ],
         "Resource": [
