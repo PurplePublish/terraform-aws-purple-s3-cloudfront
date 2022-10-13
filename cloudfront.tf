@@ -46,7 +46,7 @@ resource "aws_cloudfront_cache_policy" "s3" {
     query_strings_config {
       query_string_behavior = "all"
     }
-    enable_accept_encoding_brotli = true
+    enable_accept_encoding_brotli = false
     enable_accept_encoding_gzip   = true
   }
 }
