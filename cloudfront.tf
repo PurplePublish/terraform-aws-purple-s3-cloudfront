@@ -99,7 +99,7 @@ module "cloudfront" {
   comment = coalesce(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : "Cloudfront for ${var.bucket_name}")
 
   # Basic settings
-  http_version    = "http2and3"
+  http_version    = "http2"
   is_ipv6_enabled = true
   price_class     = var.cloudfront_price_class
   aliases         = var.cloudfront_domain != "" ? [var.cloudfront_domain] : null
