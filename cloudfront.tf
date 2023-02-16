@@ -133,6 +133,17 @@ module "cloudfront" {
       path_pattern     = "public/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
+    merge(local.behavior_defaults, { # require signing for HTML files
+      path_pattern     = "*.pkar/web/*.html"
+      target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = [aws_cloudfront_key_group.default.id]
+    }),
+    merge(local.behavior_defaults, { # allow everything else
+      path_pattern     = "*.pkar/web/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
     merge(local.behavior_defaults, {
       path_pattern     = "*/thumbnails/*"
       target_origin_id = "S3-${var.bucket_name}"
