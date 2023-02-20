@@ -47,15 +47,13 @@ export const handler = async (event, context) => {
     console.log("Path: " + path);
     const url = "https://" + domain + path
     console.log("URL: " + url);
-    console.log("KeyPairId: " + keyPairId);
-    console.log("Private Key: " + privateKey);
     const signedCookie = getSignedCookie(url, keyPairId, privateKey);
-
+    console.log("Signed Cookie: " + JSON.stringify(signedCookie))
     const response = event.Records[0].cf.response;
     response.headers['set-cookie'] = [
         {
             key: "Set-Cookie",
-            value: `CloudFront-Policy=${signedCookie['CloudFront-Policy']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
+            value: `CloudFront-Expires=${signedCookie['CloudFront-Expires']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
         }, {
             key: "Set-Cookie",
             value: `CloudFront-Key-Pair-Id=${signedCookie['CloudFront-Key-Pair-Id']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
