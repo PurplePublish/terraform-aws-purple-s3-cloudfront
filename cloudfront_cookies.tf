@@ -40,9 +40,7 @@ module "web_signed_cookies" {
   timeout                           = 5   # Limit of viewer-* lambdas
   memory_size                       = 128 # Limit of viewer-* lambdas
   lambda_at_edge                    = true
-  publish                           = true
-  create_package                    = false
-  local_existing_package            = "${path.module}/lambda/cookies/cookies-r1.zip"
+  source_path                       = "${path.module}/lambda/cookies/"
   cloudwatch_logs_retention_in_days = 30
   attach_policy_jsons               = true
   number_of_policy_jsons            = 1
