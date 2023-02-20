@@ -26,22 +26,30 @@ function getSignedCookie(url, keyPairId, privateKey) {
     });
 }
 
-exports.handler = async (event, context) => {
-    const functionName = context.functionName
+export const handler = async (event, context) => {
+    console.log("Context: " + JSON.stringify(context))
+    // Remove region from functionName
+    const functionName = context.functionName.substring(context.functionName.indexOf(".") + 1)
     if (cache.keyPairId == null) {
-        cache.keyPairId = loadParameter(`/purple/cloudfront/lambda/${functionName}/keyPairId`);
+        cache.keyPairId = await loadParameter(`/purple/cloudfront/lambda/${functionName}/keyPairId`);
     }
     if (cache.privateKey == null) {
-        cache.privateKey = loadParameter(`/purple/cloudfront/lambda/${functionName}/privateKey`, true);
+        cache.privateKey = await loadParameter(`/purple/cloudfront/lambda/${functionName}/privateKey`, true);
     }
     const {keyPairId, privateKey} = cache;
 
     const request = event.Records[0].cf.request;
     const domain = request.headers.host[0].value
     let searchString = ".pkar/web/";
+    console.log("Domain: " + domain);
     const end = request.uri.lastIndexOf(searchString);
     const path = request.uri.substring(0, end > 0 ? end + searchString.length : undefined)
-    const signedCookie = getSignedCookie(path, keyPairId, privateKey);
+    console.log("Path: " + path);
+    const url = "https://" + domain + path
+    console.log("URL: " + url);
+    console.log("KeyPairId: " + keyPairId);
+    console.log("Private Key: " + privateKey);
+    const signedCookie = getSignedCookie(url, keyPairId, privateKey);
 
     const response = event.Records[0].cf.response;
     response.headers['set-cookie'] = [
