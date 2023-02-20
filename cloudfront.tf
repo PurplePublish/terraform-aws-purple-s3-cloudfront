@@ -77,10 +77,24 @@ resource "aws_cloudfront_public_key" "purple" {
   }
 }
 
+resource "tls_private_key" "lambda" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "aws_cloudfront_public_key" "lambda" {
+  name_prefix = "${var.bucket_name}-lambda-"
+  comment     = "Public key of Purple DS (Lambda)"
+  encoded_key = tls_private_key.lambda.public_key_pem
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_cloudfront_key_group" "default" {
   name    = var.bucket_name
   comment = "Public keys for ${var.bucket_name}"
-  items   = [aws_cloudfront_public_key.purple.id]
+  items   = [aws_cloudfront_public_key.purple.id, aws_cloudfront_public_key.lambda.id]
 }
 
 resource "aws_cloudfront_origin_access_control" "default" {
@@ -132,6 +146,24 @@ module "cloudfront" {
     merge(local.behavior_defaults, {
       path_pattern     = "public/*"
       target_origin_id = "S3-${var.bucket_name}"
+    }),
+    merge(local.behavior_defaults, { # require signing for HTML files
+      path_pattern     = "*.pkar/web/*"
+      target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = [aws_cloudfront_key_group.default.id]
+
+      lambda_function_association = {
+        "origin-request" = {
+          lambda_arn   = module.tachyon.lambda_function_qualified_arn
+          include_body = false
+        }
+        "viewer-response" = {
+          lambda_arn   = module.web_signed_cookies.lambda_function_qualified_arn
+          include_body = false
+        }
+      }
     }),
     merge(local.behavior_defaults, {
       path_pattern     = "*/thumbnails/*"
