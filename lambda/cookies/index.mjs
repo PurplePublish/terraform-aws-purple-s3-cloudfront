@@ -18,11 +18,19 @@ function getExpirationTime() {
 
 function getSignedCookie(url, keyPairId, privateKey) {
     const expirationTime = getExpirationTime();
+    const policyString = JSON.stringify({
+        'Statement': [{
+            'Resource': `${url}*`,
+            'Condition': {
+                'DateLessThan': {'AWS:EpochTime': Math.floor(expirationTime.getTime() / 1000)}
+            }
+        }]
+    });
     return getSignedCookies({
         url: url,
         keyPairId: keyPairId,
         privateKey: privateKey,
-        dateLessThan: expirationTime.toISOString()
+        policy: policyString
     });
 }
 
@@ -53,7 +61,7 @@ export const handler = async (event, context) => {
     response.headers['set-cookie'] = [
         {
             key: "Set-Cookie",
-            value: `CloudFront-Expires=${signedCookie['CloudFront-Expires']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
+            value: `CloudFront-Policy=${signedCookie['CloudFront-Policy']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
         }, {
             key: "Set-Cookie",
             value: `CloudFront-Key-Pair-Id=${signedCookie['CloudFront-Key-Pair-Id']};Domain=${domain};Path=${path};Secure;HttpOnly;SameSite=Lax`
