@@ -147,6 +147,10 @@ module "cloudfront" {
       path_pattern     = "public/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "tts/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
     merge(local.behavior_defaults, { # require signing for HTML files
       path_pattern     = "*.pkar/web/*"
       target_origin_id = "S3-${var.bucket_name}"
