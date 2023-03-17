@@ -29,6 +29,7 @@ module "bucket" {
 }
 JSON
   cors_rule = [{
+    allowed_headers = ["*"]
     allowed_methods = ["GET"]
     allowed_origins = ["*"]
     expose_headers  = []

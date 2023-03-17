@@ -24,7 +24,15 @@ resource "aws_cloudfront_origin_request_policy" "s3" {
     cookie_behavior = "none"
   }
   headers_config {
-    header_behavior = "none"
+    header_behavior = "whitelist"
+    headers {
+      items = [
+        "Origin",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers",
+        "Referer",
+      ]
+    }
   }
   query_strings_config {
     query_string_behavior = "all"
@@ -41,7 +49,15 @@ resource "aws_cloudfront_cache_policy" "s3" {
       cookie_behavior = "none"
     }
     headers_config {
-      header_behavior = "none"
+      header_behavior = "whitelist"
+      headers {
+        items = [
+          "Origin",
+          "Access-Control-Request-Method",
+          "Access-Control-Request-Headers",
+          "Referer",
+        ]
+      }
     }
     query_strings_config {
       query_string_behavior = "all"
