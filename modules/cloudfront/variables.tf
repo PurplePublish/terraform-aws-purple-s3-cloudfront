@@ -47,7 +47,7 @@ variable "cloudfront_cors_allow_origins" {
   default = null
 }
 
-variable "cloudfront_public_tts" {
+variable "cloudfront_public_web" {
   type    = bool
   default = false
 }
