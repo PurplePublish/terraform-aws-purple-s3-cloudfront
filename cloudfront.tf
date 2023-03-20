@@ -167,12 +167,20 @@ module "cloudfront" {
       path_pattern     = "tts/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
-    merge(local.behavior_defaults, {
+    merge(local.behavior_defaults, { # require signing for HTML files
       path_pattern     = "*.pkar/web/*"
       target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = [aws_cloudfront_key_group.default.id]
+
       lambda_function_association = {
         "origin-request" = {
           lambda_arn   = module.tachyon.lambda_function_qualified_arn
+          include_body = false
+        }
+        "viewer-response" = {
+          lambda_arn   = module.web_signed_cookies.lambda_function_qualified_arn
           include_body = false
         }
       }
