@@ -6,14 +6,16 @@ variable "bucket_name" {
   type = string
 }
 
-variable "bucket_iam_user_name" {
-  type    = string
-  default = null
+variable "bucket_arn" {
+  type = string
 }
 
-variable "bucket_additional_cloudfront_arns" {
-  type    = list(string)
-  default = []
+variable "bucket_regional_domain_name" {
+  type = string
+}
+
+variable "bucket_region" {
+  type = string
 }
 
 // ==========================================================================================================================
@@ -43,6 +45,42 @@ variable "cloudfront_minimum_protocol_version" {
 variable "cloudfront_cors_allow_origins" {
   type    = list(string)
   default = null
+}
+
+variable "cloudfront_public_tts" {
+  type    = bool
+  default = false
+}
+
+variable "cloudfront_postfix" {
+  type    = string
+  default = ""
+}
+
+variable "cloudfront_tachyon_qualified_arn" {
+  type = string
+}
+
+variable "cloudfront_key_group_id" {
+  type = string
+}
+
+variable "cloudfront_cookies_qualified_arn" {
+  type    = string
+  default = null
+}
+
+variable "cloudfront_cache_policy_id" {
+  type = string
+}
+
+variable "cloudfront_origin_request_policy_id" {
+  type = string
+}
+
+variable "cloudfront_wait_for_deployment" {
+  type    = bool
+  default = false
 }
 
 // ==========================================================================================================================

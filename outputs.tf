@@ -43,17 +43,37 @@ output "s3_secret_key" {
 // ==========================================================================================================================
 
 output "cloudfront_distribution_id" {
-  value = module.cloudfront.cloudfront_distribution_id
+  value = module.default_cloudfront.cloudfront_distribution_id
 }
 
 output "cloudfront_distribution_domain_name" {
-  value = module.cloudfront.cloudfront_distribution_domain_name
+  value = module.default_cloudfront.cloudfront_distribution_domain_name
 }
 
 output "cloudfront_distribution_hosted_zone_id" {
-  value = module.cloudfront.cloudfront_distribution_hosted_zone_id
+  value = module.default_cloudfront.cloudfront_distribution_hosted_zone_id
 }
 
 output "cloudfront_public_key_id" {
   value = aws_cloudfront_public_key.purple.id
+}
+
+output "cloudfront_key_group_id" {
+  value = aws_cloudfront_key_group.default.id
+}
+
+output "cloudfront_cache_policy_id" {
+  value = aws_cloudfront_cache_policy.s3.id
+}
+
+output "cloudfront_origin_request_policy_id" {
+  value = aws_cloudfront_origin_request_policy.s3.id
+}
+
+// ==========================================================================================================================
+// Lambdas
+// ==========================================================================================================================
+
+output "tachyon_qualified_arn" {
+  value = module.lambdas.tachyon_qualified_arn
 }

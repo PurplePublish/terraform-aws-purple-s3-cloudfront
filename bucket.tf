@@ -1,3 +1,21 @@
+data "aws_iam_policy_document" "bucket" {
+  statement {
+    sid    = "AllowCloudFrontServicePrincipalReadOnly"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::${var.bucket_name}/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = concat([module.default_cloudfront.cloudfront_distribution_arn], var.bucket_additional_cloudfront_arns)
+    }
+  }
+}
+
 module "bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = ">= 3.4.0"
@@ -7,27 +25,7 @@ module "bucket" {
 
   bucket        = var.bucket_name
   attach_policy = true
-  policy        = <<JSON
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "AllowCloudFrontServicePrincipalReadOnly",
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "cloudfront.amazonaws.com"
-            },
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::${var.bucket_name}/*",
-            "Condition": {
-                "StringEquals": {
-                    "AWS:SourceArn": "${module.cloudfront.cloudfront_distribution_arn}"
-                }
-            }
-        }
-    ]
-}
-JSON
+  policy        = data.aws_iam_policy_document.bucket.json
   cors_rule = [{
     allowed_headers = ["*"]
     allowed_methods = ["GET"]
