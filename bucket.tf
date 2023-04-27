@@ -23,9 +23,14 @@ module "bucket" {
     aws = aws.bucket-region
   }
 
-  bucket        = var.bucket_name
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.bucket.json
+  bucket                  = var.bucket_name
+  attach_policy           = true
+  policy                  = data.aws_iam_policy_document.bucket.json
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+
   cors_rule = [{
     allowed_headers = ["*"]
     allowed_methods = ["GET"]
