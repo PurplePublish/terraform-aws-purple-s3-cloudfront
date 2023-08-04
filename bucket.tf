@@ -33,7 +33,7 @@ module "bucket" {
 
   cors_rule = [{
     allowed_headers = ["*"]
-    allowed_methods = ["GET"]
+    allowed_methods = ["GET", "PUT"]
     allowed_origins = ["*"]
     expose_headers  = []
     max_age_seconds = 0
