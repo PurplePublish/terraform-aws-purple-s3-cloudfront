@@ -18,18 +18,20 @@ data "aws_iam_policy_document" "bucket" {
 
 module "bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = ">= 3.4.0"
+  version = ">= 3.15.1"
   providers = {
     aws = aws.bucket-region
   }
 
-  bucket                  = var.bucket_name
-  attach_policy           = true
-  policy                  = data.aws_iam_policy_document.bucket.json
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  bucket                   = var.bucket_name
+  attach_policy            = true
+  policy                   = data.aws_iam_policy_document.bucket.json
+  block_public_acls        = false
+  block_public_policy      = false
+  ignore_public_acls       = false
+  restrict_public_buckets  = false
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerPreferred"
 
   cors_rule = [{
     allowed_headers = ["*"]
