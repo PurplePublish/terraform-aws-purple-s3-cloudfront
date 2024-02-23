@@ -40,6 +40,19 @@ module "bucket" {
     expose_headers  = []
     max_age_seconds = 0
   }]
+  lifecycle_rule = [
+    {
+      id      = "intelligent-tiering"
+      enabled = true
+
+      transition = [
+        {
+          days          = 0
+          storage_class = "INTELLIGENT_TIERING"
+        }
+      ]
+    }
+  ]
 
   versioning = {
     enabled = true
