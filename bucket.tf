@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "bucket" {
 
 module "bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = ">= 3.15.1"
+  version = "4.1.2"
   providers = {
     aws = aws.bucket-region
   }

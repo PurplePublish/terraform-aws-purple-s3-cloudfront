@@ -1,6 +1,6 @@
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = ">= 4.1.0"
+  version = "5.0.1"
   providers = {
     aws = aws.us-east-1
   }
@@ -8,6 +8,7 @@ module "acm" {
   create_certificate   = var.cloudfront_domain != "" && var.manage_certificate
   domain_name          = var.cloudfront_domain
   zone_id              = var.acm_zone_id
+  validation_method    = "DNS"
   validate_certificate = true
   wait_for_validation  = true
 
