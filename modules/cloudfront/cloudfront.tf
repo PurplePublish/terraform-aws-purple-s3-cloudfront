@@ -98,6 +98,13 @@ module "cloudfront" {
       trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
     }),
     merge(local.behavior_defaults, {
+      path_pattern     = "*/web/*.pkar/*"
+      target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
+    }),
+    merge(local.behavior_defaults, {
       path_pattern     = "*/thumbnails/*"
       target_origin_id = "S3-${var.bucket_name}"
     })
