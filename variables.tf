@@ -50,6 +50,12 @@ variable "cloudfront_public_web" {
   default = false
 }
 
+variable "cloudfront_logging_config" {
+  description = "The logging configuration that controls how logs are written to your distribution (maximum one)."
+  type        = any
+  default     = {}
+}
+
 // ==========================================================================================================================
 // ACM
 // ==========================================================================================================================

@@ -65,11 +65,6 @@ variable "cloudfront_key_group_id" {
   type = string
 }
 
-variable "cloudfront_cookies_qualified_arn" {
-  type    = string
-  default = null
-}
-
 variable "cloudfront_cache_policy_id" {
   type = string
 }
@@ -81,6 +76,12 @@ variable "cloudfront_origin_request_policy_id" {
 variable "cloudfront_wait_for_deployment" {
   type    = bool
   default = false
+}
+
+variable "cloudfront_logging_config" {
+  description = "The logging configuration that controls how logs are written to your distribution (maximum one)."
+  type        = any
+  default     = {}
 }
 
 // ==========================================================================================================================

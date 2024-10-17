@@ -82,6 +82,7 @@ module "default_cloudfront" {
   cloudfront_cache_policy_id          = aws_cloudfront_cache_policy.s3.id
   cloudfront_origin_request_policy_id = aws_cloudfront_origin_request_policy.s3.id
   cloudfront_key_group_id             = aws_cloudfront_key_group.default.id
+  cloudfront_logging_config           = var.cloudfront_logging_config
   manage_certificate                  = var.manage_certificate
   acm_certificate_name                = var.acm_certificate_name
   acm_certificate_arn                 = var.acm_certificate_arn

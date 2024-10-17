@@ -117,4 +117,6 @@ module "cloudfront" {
     } : {
     cloudfront_default_certificate = true
   }
+
+  logging_config = var.cloudfront_logging_config
 }
