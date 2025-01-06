@@ -38,11 +38,11 @@ module "tachyon" {
   handler                           = "lambda-handler.handler"
   runtime                           = "nodejs18.x"
   timeout                           = 30
-  memory_size                       = 256
+  memory_size                       = 512
   lambda_at_edge                    = true
   publish                           = true
   create_package                    = false
-  local_existing_package            = "${path.module}/lambda/tachyon/tachyon-r42.zip"
+  local_existing_package            = "${path.module}/lambda/tachyon/tachyon-r44.zip"
   cloudwatch_logs_retention_in_days = 30
   attach_policy_jsons               = true
   number_of_policy_jsons            = 1
