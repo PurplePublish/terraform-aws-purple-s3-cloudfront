@@ -51,6 +51,14 @@ module "bucket" {
           storage_class = "INTELLIGENT_TIERING"
         }
       ]
+    },
+    {
+      id                                     = "automatic-cleanup"
+      enabled                                = var.bucket_automatic_cleanup_enabled
+      abort_incomplete_multipart_upload_days = var.bucket_automatic_cleanup_multipart_upload_days
+      noncurrent_version_expiration = {
+        days = var.bucket_automatic_cleanup_days
+      }
     }
   ]
 

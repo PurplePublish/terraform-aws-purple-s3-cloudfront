@@ -16,6 +16,23 @@ variable "bucket_additional_cloudfront_arns" {
   default = []
 }
 
+variable "bucket_automatic_cleanup_enabled" {
+  type = bool
+  default = true
+}
+
+variable "bucket_automatic_cleanup_days" {
+  description = "How many days should deleted objects be kept"
+  type = number
+  default = 400
+}
+
+variable "bucket_automatic_cleanup_multipart_upload_days" {
+  description = "How many days should aborted multipart uploads be kept"
+  type = number
+  default = 7
+}
+
 // ==========================================================================================================================
 // Cloudfront
 // ==========================================================================================================================
