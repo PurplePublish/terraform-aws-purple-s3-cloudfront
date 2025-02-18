@@ -83,11 +83,11 @@ module "cloudfront" {
   })
   ordered_cache_behavior = [
     merge(local.behavior_defaults, {
-      path_pattern     = "public/*"
+      path_pattern     = "${bucket_prefix}public/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
     merge(local.behavior_defaults, {
-      path_pattern     = "tts/*"
+      path_pattern     = "${bucket_prefix}tts/*"
       target_origin_id = "S3-${var.bucket_name}"
     }),
     merge(local.behavior_defaults, {

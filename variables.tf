@@ -6,6 +6,11 @@ variable "bucket_name" {
   type = string
 }
 
+variable "bucket_prefix" {
+  type    = string
+  default = ""
+}
+
 variable "bucket_iam_user_name" {
   type    = string
   default = null

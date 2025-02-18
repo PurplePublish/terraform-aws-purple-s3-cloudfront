@@ -69,7 +69,7 @@ module "default_cloudfront" {
     aws.us-east-1 = aws.us-east-1
   }
   bucket_name                         = var.bucket_name
-  bucket_arn                          = module.bucket.s3_bucket_arn
+  bucket_prefix                       = var.bucket_prefix
   bucket_regional_domain_name         = module.bucket.s3_bucket_bucket_regional_domain_name
   bucket_region                       = module.bucket.s3_bucket_region
   cloudfront_comment                  = var.cloudfront_comment
