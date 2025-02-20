@@ -1,7 +1,7 @@
 resource "aws_cloudfront_public_key" "purple" {
   name_prefix = "${var.bucket_name}-"
   comment     = "Public key of Purple DS"
-  encoded_key = chomp(replace(file("${path.module}/cloudfront/purple-public.pem"), "\r\n", "\n"))
+  encoded_key = replace(file("${path.module}/cloudfront/purple-public.pem"), "\r\n", "\n")
   lifecycle {
     create_before_destroy = true
   }
