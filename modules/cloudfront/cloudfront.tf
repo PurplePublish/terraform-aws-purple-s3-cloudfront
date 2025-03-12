@@ -107,6 +107,10 @@ module "cloudfront" {
     merge(local.behavior_defaults, {
       path_pattern     = "*/thumbnails/*"
       target_origin_id = "S3-${var.bucket_name}"
+    }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "thumbnails/*"
+      target_origin_id = "S3-${var.bucket_name}"
     })
   ]
 
