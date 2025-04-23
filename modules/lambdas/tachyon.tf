@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "tachyon_bucket" {
 
 module "tachyon" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.7.0"
+  version = "7.20.2"
   providers = {
     aws = aws.us-east-1
   }

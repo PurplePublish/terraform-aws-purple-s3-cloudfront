@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "web_signed_cookies" {
 
 module "web_signed_cookies" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = ">= 4.0.2"
+  version = "7.20.2"
   providers = {
     aws = aws.us-east-1
   }

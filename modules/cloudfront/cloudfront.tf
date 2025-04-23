@@ -45,7 +45,7 @@ resource "aws_cloudfront_origin_access_control" "default" {
 
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "3.4.0"
+  version = "4.1.0"
 
   # Metadata
   comment = coalesce(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : "Cloudfront for ${var.bucket_name}")
