@@ -36,7 +36,7 @@ module "tachyon" {
   function_name                     = "tachyon-${var.bucket_name}"
   description                       = "Lambda@Edge Tachyon for ${var.bucket_name}"
   handler                           = "lambda-handler.handler"
-  runtime                           = "nodejs18.x"
+  runtime                           = "nodejs22.x"
   timeout                           = 30
   memory_size                       = 512
   lambda_at_edge                    = true
