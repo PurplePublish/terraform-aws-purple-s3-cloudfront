@@ -50,7 +50,7 @@ module "web_signed_cookies" {
   function_name                     = "purple-web-${var.bucket_name}"
   description                       = "Lambda@Edge for ${var.bucket_name}"
   handler                           = "index.handler"
-  runtime                           = "nodejs18.x"
+  runtime                           = "nodejs22.x"
   timeout                           = 5   # Limit of viewer-* lambdas
   memory_size                       = 128 # Limit of viewer-* lambdas
   lambda_at_edge                    = true
