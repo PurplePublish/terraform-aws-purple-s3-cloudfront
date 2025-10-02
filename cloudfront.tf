@@ -28,20 +28,23 @@ resource "aws_cloudfront_cache_policy" "s3" {
       }
     }
     query_strings_config {
-      query_string_behavior = "allExcept"
-      query_strings {
-        items = [
-          "fbclid",
-          "gclid",
-          "utm_campaign",
-          "utm_medium",
-          "utm_source",
-          "utm_term",
-          "msclkid",
-          "_ga",
-          "mc_cid",
-          "dclid"
-        ]
+      query_string_behavior = var.cloudfront_exclude_tracking_params ? "allExcept" : "all"
+      dynamic "query_strings" {
+        for_each = var.cloudfront_exclude_tracking_params ? [1] : []
+        content {
+          items = [
+            "fbclid",
+            "gclid",
+            "utm_campaign",
+            "utm_medium",
+            "utm_source",
+            "utm_term",
+            "msclkid",
+            "_ga",
+            "mc_cid",
+            "dclid"
+          ]
+        }
       }
     }
     enable_accept_encoding_brotli = false
@@ -66,20 +69,23 @@ resource "aws_cloudfront_origin_request_policy" "s3" {
     }
   }
   query_strings_config {
-    query_string_behavior = "allExcept"
-    query_strings {
-      items = [
-        "fbclid",
-        "gclid",
-        "utm_campaign",
-        "utm_medium",
-        "utm_source",
-        "utm_term",
-        "msclkid",
-        "_ga",
-        "mc_cid",
-        "dclid"
-      ]
+    query_string_behavior = var.cloudfront_exclude_tracking_params ? "allExcept" : "all"
+    dynamic "query_strings" {
+      for_each = var.cloudfront_exclude_tracking_params ? [1] : []
+      content {
+        items = [
+          "fbclid",
+          "gclid",
+          "utm_campaign",
+          "utm_medium",
+          "utm_source",
+          "utm_term",
+          "msclkid",
+          "_ga",
+          "mc_cid",
+          "dclid"
+        ]
+      }
     }
   }
 }

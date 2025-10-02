@@ -22,20 +22,20 @@ variable "bucket_additional_cloudfront_arns" {
 }
 
 variable "bucket_automatic_cleanup_enabled" {
-  type = bool
+  type    = bool
   default = true
 }
 
 variable "bucket_automatic_cleanup_days" {
   description = "How many days should deleted objects be kept"
-  type = number
-  default = 400
+  type        = number
+  default     = 400
 }
 
 variable "bucket_automatic_cleanup_multipart_upload_days" {
   description = "How many days should aborted multipart uploads be kept"
-  type = number
-  default = 7
+  type        = number
+  default     = 7
 }
 
 // ==========================================================================================================================
@@ -76,6 +76,12 @@ variable "cloudfront_logging_config" {
   description = "The logging configuration that controls how logs are written to your distribution (maximum one)."
   type        = any
   default     = {}
+}
+
+variable "cloudfront_exclude_tracking_params" {
+  description = "Exclude common tracking parameters (utm_*, fbclid, gclid, etc.) from CloudFront cache key to improve cache hit rates for social media traffic"
+  type        = bool
+  default     = false
 }
 
 // ==========================================================================================================================
