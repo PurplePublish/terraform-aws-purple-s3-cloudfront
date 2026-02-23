@@ -50,6 +50,10 @@ output "cloudfront_distribution_id" {
   value = module.default_cloudfront.cloudfront_distribution_id
 }
 
+output "cloudfront_distribution_arn" {
+  value = module.default_cloudfront.cloudfront_distribution_arn
+}
+
 output "cloudfront_distribution_domain_name" {
   value = module.default_cloudfront.cloudfront_distribution_domain_name
 }
