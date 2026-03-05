@@ -63,14 +63,8 @@ module "cloudfront" {
       domain_name              = var.bucket_regional_domain_name
       origin_access_control_id = aws_cloudfront_origin_access_control.default.id
       custom_header = {
-        region = {
-          name  = "X-AWS-S3-REGION"
-          value = var.bucket_region
-        }
-        bucket = {
-          name  = "X-AWS-S3-BUCKET"
-          value = var.bucket_name
-        }
+        "X-AWS-S3-REGION" = var.bucket_region
+        "X-AWS-S3-BUCKET" = var.bucket_name
       }
     }
   }
