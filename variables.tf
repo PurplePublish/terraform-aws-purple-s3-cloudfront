@@ -80,7 +80,7 @@ variable "cloudfront_public_web" {
 variable "cloudfront_logging_config" {
   description = "The logging configuration that controls how logs are written to your distribution (maximum one)."
   type        = any
-  default     = {}
+  default     = null
 }
 
 variable "cloudfront_exclude_tracking_params" {

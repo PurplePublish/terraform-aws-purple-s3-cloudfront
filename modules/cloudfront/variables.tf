@@ -82,7 +82,7 @@ variable "cloudfront_wait_for_deployment" {
 variable "cloudfront_logging_config" {
   description = "The logging configuration that controls how logs are written to your distribution (maximum one)."
   type        = any
-  default     = {}
+  default     = null
 }
 
 // ==========================================================================================================================
