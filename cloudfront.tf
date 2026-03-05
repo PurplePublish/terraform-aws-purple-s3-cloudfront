@@ -97,10 +97,7 @@ resource "aws_cloudfront_key_group" "default" {
 }
 
 module "default_cloudfront" {
-  source = "./modules/cloudfront"
-  providers = {
-    aws.us-east-1 = aws
-  }
+  source                              = "./modules/cloudfront"
   bucket_name                         = var.bucket_name
   bucket_prefix                       = var.bucket_prefix
   bucket_regional_domain_name         = module.bucket.s3_bucket_bucket_regional_domain_name
