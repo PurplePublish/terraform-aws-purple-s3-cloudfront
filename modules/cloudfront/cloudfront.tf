@@ -51,11 +51,12 @@ module "cloudfront" {
   comment = coalesce(var.cloudfront_comment, var.cloudfront_domain != "" ? "Cloudfront for ${var.cloudfront_domain}" : "Cloudfront for ${var.bucket_name}")
 
   # Basic settings
-  http_version        = "http2"
-  is_ipv6_enabled     = true
-  price_class         = var.cloudfront_price_class
-  aliases             = var.cloudfront_domain != "" ? [var.cloudfront_domain] : null
-  wait_for_deployment = var.cloudfront_wait_for_deployment
+  http_version          = "http2"
+  is_ipv6_enabled       = true
+  price_class           = var.cloudfront_price_class
+  aliases               = var.cloudfront_domain != "" ? [var.cloudfront_domain] : null
+  wait_for_deployment   = var.cloudfront_wait_for_deployment
+  origin_access_control = null
 
   # Origins
   origin = {
