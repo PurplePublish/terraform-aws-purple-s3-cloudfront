@@ -17,12 +17,9 @@ data "aws_iam_policy_document" "bucket" {
 }
 
 module "bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.7.0"
-  providers = {
-    aws = aws.bucket-region
-  }
-
+  source                   = "terraform-aws-modules/s3-bucket/aws"
+  version                  = "5.10.0"
+  region                   = var.bucket_region
   bucket                   = var.bucket_name
   attach_policy            = true
   policy                   = data.aws_iam_policy_document.bucket.json

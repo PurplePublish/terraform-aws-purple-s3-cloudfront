@@ -27,12 +27,9 @@ data "aws_iam_policy_document" "tachyon_bucket" {
 }
 
 module "tachyon" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.2"
-  providers = {
-    aws = aws.us-east-1
-  }
-
+  source                            = "terraform-aws-modules/lambda/aws"
+  version                           = "8.7.0"
+  region                            = "us-east-1"
   function_name                     = "tachyon-${var.bucket_name}"
   description                       = "Lambda@Edge Tachyon for ${var.bucket_name}"
   handler                           = "lambda-handler.handler"

@@ -6,6 +6,11 @@ variable "bucket_name" {
   type = string
 }
 
+variable "bucket_region" {
+  type    = string
+  default = "eu-central-1"
+}
+
 variable "bucket_prefix" {
   type    = string
   default = ""

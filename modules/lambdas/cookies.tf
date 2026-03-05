@@ -41,12 +41,9 @@ data "aws_iam_policy_document" "web_signed_cookies" {
 }
 
 module "web_signed_cookies" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.2"
-  providers = {
-    aws = aws.us-east-1
-  }
-
+  source                            = "terraform-aws-modules/lambda/aws"
+  version                           = "8.7.0"
+  region                            = "us-east-1"
   function_name                     = "purple-web-${var.bucket_name}"
   description                       = "Lambda@Edge for ${var.bucket_name}"
   handler                           = "index.handler"

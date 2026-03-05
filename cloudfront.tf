@@ -97,11 +97,7 @@ resource "aws_cloudfront_key_group" "default" {
 }
 
 module "default_cloudfront" {
-  source = "./modules/cloudfront"
-
-  providers = {
-    aws.us-east-1 = aws.us-east-1
-  }
+  source                              = "./modules/cloudfront"
   bucket_name                         = var.bucket_name
   bucket_prefix                       = var.bucket_prefix
   bucket_regional_domain_name         = module.bucket.s3_bucket_bucket_regional_domain_name
@@ -121,19 +117,4 @@ module "default_cloudfront" {
   acm_certificate_name                = var.acm_certificate_name
   acm_certificate_arn                 = var.acm_certificate_arn
   acm_zone_id                         = var.acm_zone_id
-}
-
-moved {
-  from = module.cloudfront
-  to   = module.default_cloudfront.module.cloudfront
-}
-
-moved {
-  from = aws_cloudfront_origin_access_control.default
-  to   = module.default_cloudfront.aws_cloudfront_origin_access_control.default
-}
-
-moved {
-  from = aws_cloudfront_response_headers_policy.s3
-  to   = module.default_cloudfront.aws_cloudfront_response_headers_policy.s3
 }
