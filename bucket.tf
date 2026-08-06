@@ -14,6 +14,31 @@ data "aws_iam_policy_document" "bucket" {
       values   = concat([module.default_cloudfront.cloudfront_distribution_arn], var.bucket_additional_cloudfront_arns)
     }
   }
+
+  # Without s3:ListBucket, S3 answers a GetObject for a key that does not exist with
+  # AccessDenied rather than NoSuchKey, and CloudFront surfaces that to the viewer as 403.
+  # A missing object is then indistinguishable from a rejected signature, which makes both
+  # undiagnosable: the same status covers "this content is gone" and "this URL is not valid".
+  #
+  # Granting it does not let anyone enumerate the bucket. CloudFront never issues ListBucket
+  # on a viewer's behalf and exposes no listing operation, and the grant stays restricted to
+  # the CloudFront service principal for these distributions only. The single effect is that
+  # an absent key now returns 404 instead of 403.
+  statement {
+    sid    = "AllowCloudFrontServicePrincipalDistinguishMissingObjects"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::${var.bucket_name}"]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = concat([module.default_cloudfront.cloudfront_distribution_arn], var.bucket_additional_cloudfront_arns)
+    }
+  }
 }
 
 module "bucket" {

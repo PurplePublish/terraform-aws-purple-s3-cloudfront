@@ -9,6 +9,12 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.8] - 2026-08-06
+### Changed
+- Grant the CloudFront service principal `s3:ListBucket` on the bucket, so a request for an
+  object that does not exist returns `404` instead of `403`. Previously a missing object and a
+  rejected signature were indistinguishable to both viewers and log analysis.
+
 ## [0.1.7] - 2026-03-05
 ### Fixed
 - Correct default value for `cloudfront_logging_config`.
