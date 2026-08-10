@@ -44,6 +44,20 @@ variable "bucket_automatic_cleanup_multipart_upload_days" {
 }
 
 // ==========================================================================================================================
+// Tachyon
+// ==========================================================================================================================
+
+variable "tachyon_memory_size" {
+  description = <<-EOT
+    Memory in MB for the Tachyon image-resizing Lambda@Edge. Raise this for buckets holding unusually large
+    originals: Lambda CPU scales with memory, so it governs both out-of-memory kills and resize duration.
+    512 MB is not enough for larger source images.
+  EOT
+  type        = number
+  default     = 2048
+}
+
+// ==========================================================================================================================
 // Cloudfront
 // ==========================================================================================================================
 

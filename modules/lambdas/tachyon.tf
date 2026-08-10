@@ -27,15 +27,17 @@ data "aws_iam_policy_document" "tachyon_bucket" {
 }
 
 module "tachyon" {
-  source                            = "terraform-aws-modules/lambda/aws"
-  version                           = "8.7.0"
-  region                            = "us-east-1"
-  function_name                     = "tachyon-${var.bucket_name}"
-  description                       = "Lambda@Edge Tachyon for ${var.bucket_name}"
-  handler                           = "lambda-handler.handler"
-  runtime                           = "nodejs22.x"
+  source        = "terraform-aws-modules/lambda/aws"
+  version       = "8.7.0"
+  region        = "us-east-1"
+  function_name = "tachyon-${var.bucket_name}"
+  description   = "Lambda@Edge Tachyon for ${var.bucket_name}"
+  handler       = "lambda-handler.handler"
+  runtime       = "nodejs22.x"
+  # 30s is the hard ceiling AWS allows for an origin-request Lambda@Edge, so this cannot be raised.
+  # Resizing must fit inside it - see tachyon_memory_size, which is the lever that actually helps.
   timeout                           = 30
-  memory_size                       = 512
+  memory_size                       = var.tachyon_memory_size
   lambda_at_edge                    = true
   publish                           = true
   create_package                    = false

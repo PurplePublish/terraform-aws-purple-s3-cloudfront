@@ -9,6 +9,18 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.9] - 2026-08-10
+### Changed
+- Raise the default Tachyon memory from 512 MB to 2048 MB, and expose it as `tachyon_memory_size`.
+  512 MB is not enough for larger source images: decoding an original into a bitmap needs far more memory than
+  the encoded file size suggests, and on exceeding its allocation Lambda kills the function rather than letting
+  it return an error. Because Tachyon runs as an origin-request Lambda@Edge, CloudFront has by then accepted
+  the viewer connection and has nothing to send, so callers see a connected but silent socket until the 30s
+  timeout expires rather than a failure they can act on.
+  Lambda CPU scales with memory, so this also cuts resize duration; for CPU-bound work the billed GB-ms should
+  stay roughly flat. **Applying this republishes the Lambda@Edge version and triggers a CloudFront
+  distribution deployment, which takes a few minutes to propagate.**
+
 ## [0.1.8] - 2026-08-06
 ### Changed
 - Grant the CloudFront service principal `s3:ListBucket` on the bucket, so a request for an
