@@ -98,7 +98,7 @@ variable "cloudfront_logging_config" {
 }
 
 variable "cloudfront_exclude_tracking_params" {
-  description = "Exclude common tracking parameters (utm_*, fbclid, gclid, etc.) from CloudFront cache key to improve cache hit rates for social media traffic"
+  description = "Exclude common third-party click-tracking parameters (utm_*, fbclid, gclid, etc.) from the CloudFront cache key to improve cache hit rates for social media traffic. The attribution parameters (appId, platform) are always excluded from the cache key and are not affected by this toggle."
   type        = bool
   default     = false
 }

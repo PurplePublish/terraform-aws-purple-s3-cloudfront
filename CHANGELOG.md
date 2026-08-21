@@ -9,6 +9,21 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.10] - 2026-08-21
+### Changed
+- Keep the attribution query parameters `appId` and `platform` out of the CloudFront cache key and out of the
+  origin request policy. They exist only to attribute traffic in access-log analysis: neither changes the object
+  returned - the request path is the S3 key - and CloudFront records the query string verbatim in the access log
+  whether or not it is part of the cache key. Keying on them split the cache across values that all resolve to
+  the same object, which cost hit rate on exactly the small, frequently requested objects where it matters most.
+  The exclusion is unconditional and no longer tied to `cloudfront_exclude_tracking_params`, which now covers
+  only third-party click-tracking parameters. As a result `query_string_behavior` is always `allExcept`, where
+  it was `all` for callers that left that variable at its default. Parameters that do change the response -
+  `response-content-disposition` and the Tachyon image parameters `w`/`h`/`webp`/`quality`/`crop` - stay in the
+  cache key. **Applying this updates the cache and origin request policies in place - their ids do not change,
+  so attached distributions are not replaced - and triggers a CloudFront distribution deployment; cached objects
+  are re-keyed, so expect a brief dip in hit rate before it settles above the previous level.**
+
 ## [0.1.9] - 2026-08-10
 ### Changed
 - Raise the default Tachyon memory from 512 MB to 2048 MB, and expose it as `tachyon_memory_size`.
