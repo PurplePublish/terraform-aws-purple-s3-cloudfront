@@ -7,6 +7,46 @@ resource "aws_cloudfront_public_key" "purple" {
   }
 }
 
+locals {
+  # Query parameters that exist only to attribute traffic in access-log analysis. They never change
+  # the object returned - the request path is the S3 key - and CloudFront records the query string
+  # verbatim in the access log whether or not it is part of the cache key. Keying on them therefore
+  # buys nothing and splits the cache across values that all resolve to the same object, which costs
+  # hit rate on exactly the small, frequently requested objects where it matters most. So they are
+  # excluded unconditionally, independently of `cloudfront_exclude_tracking_params`.
+  #
+  # The rule for anything added here: a parameter that only describes the caller does not belong in
+  # the cache key, and a parameter that changes the response has to stay in it -
+  # `response-content-disposition` sets a response header, and the Tachyon image parameters
+  # (`w`, `h`, `webp`, `quality`, `crop`) change the returned image. That is why this is a deny-list
+  # and must not be inverted into an allow-list.
+  cloudfront_attribution_query_params = [
+    "appId",
+    "platform",
+  ]
+
+  # Click-tracking parameters. Unlike the attribution parameters these are set by third parties on
+  # inbound links, so dropping them stays an opt-in per distribution.
+  cloudfront_tracking_query_params = [
+    "fbclid",
+    "gclid",
+    "utm_campaign",
+    "utm_medium",
+    "utm_source",
+    "utm_term",
+    "msclkid",
+    "_ga",
+    "mc_cid",
+    "dclid",
+  ]
+
+  # `allExcept` requires a non-empty item list; the attribution parameters guarantee one.
+  cloudfront_excluded_query_params = concat(
+    local.cloudfront_attribution_query_params,
+    var.cloudfront_exclude_tracking_params ? local.cloudfront_tracking_query_params : [],
+  )
+}
+
 resource "aws_cloudfront_cache_policy" "s3" {
   name        = var.bucket_name
   min_ttl     = 1
@@ -28,23 +68,9 @@ resource "aws_cloudfront_cache_policy" "s3" {
       }
     }
     query_strings_config {
-      query_string_behavior = var.cloudfront_exclude_tracking_params ? "allExcept" : "all"
-      dynamic "query_strings" {
-        for_each = var.cloudfront_exclude_tracking_params ? [1] : []
-        content {
-          items = [
-            "fbclid",
-            "gclid",
-            "utm_campaign",
-            "utm_medium",
-            "utm_source",
-            "utm_term",
-            "msclkid",
-            "_ga",
-            "mc_cid",
-            "dclid"
-          ]
-        }
+      query_string_behavior = "allExcept"
+      query_strings {
+        items = local.cloudfront_excluded_query_params
       }
     }
     enable_accept_encoding_brotli = false
@@ -69,23 +95,9 @@ resource "aws_cloudfront_origin_request_policy" "s3" {
     }
   }
   query_strings_config {
-    query_string_behavior = var.cloudfront_exclude_tracking_params ? "allExcept" : "all"
-    dynamic "query_strings" {
-      for_each = var.cloudfront_exclude_tracking_params ? [1] : []
-      content {
-        items = [
-          "fbclid",
-          "gclid",
-          "utm_campaign",
-          "utm_medium",
-          "utm_source",
-          "utm_term",
-          "msclkid",
-          "_ga",
-          "mc_cid",
-          "dclid"
-        ]
-      }
+    query_string_behavior = "allExcept"
+    query_strings {
+      items = local.cloudfront_excluded_query_params
     }
   }
 }
