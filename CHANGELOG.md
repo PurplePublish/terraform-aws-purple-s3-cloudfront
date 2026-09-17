@@ -9,6 +9,31 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.13] - 2026-09-17
+### Changed
+- Drop `Origin`, `Access-Control-Request-Method`, `Access-Control-Request-Headers` and `Referer` from the
+  CloudFront cache key; the headers policy is now `none`. All four remain in the origin request policy, so
+  S3 and the Tachyon Lambda@Edge still receive them unchanged - only the cache key drops them.
+  None of the four can change the cached object: CORS is answered at the edge by the response headers
+  policy, which derives `Access-Control-Allow-Origin` from the viewer's `Origin` on every response it
+  serves, cache hits included; the two `Access-Control-Request-*` headers are sent only on a preflight
+  `OPTIONS`, which is never cached because it is not in `cached_methods`; and `Referer` has no consumer at
+  all - Tachyon keys solely on the request path and the image query parameters. Keying on them multiplied
+  the entries per object by the product of their distinct values, so how much hit rate this recovers
+  depends on a distribution's traffic mix - most on the small, frequently requested objects, and most of
+  all where a web experience is served from the same host as its assets and `Referer` carries a full page
+  URL. **Applying this updates the cache policy in place - its id does not change, so attached
+  distributions are not replaced - and triggers a CloudFront distribution deployment; cached objects are
+  re-keyed, so expect a brief dip in hit rate before it settles.**
+
+## [0.1.12] - 2026-09-04
+### Changed
+- Update the Tachyon Lambda@Edge package to `r51`.
+
+## [0.1.11] - 2026-09-02
+### Changed
+- Update the Tachyon Lambda@Edge package to `r48`.
+
 ## [0.1.10] - 2026-08-21
 ### Changed
 - Keep the attribution query parameters `appId` and `platform` out of the CloudFront cache key and out of the
