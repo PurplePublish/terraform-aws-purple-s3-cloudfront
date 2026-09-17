@@ -56,16 +56,21 @@ resource "aws_cloudfront_cache_policy" "s3" {
     cookies_config {
       cookie_behavior = "none"
     }
+    # No request header belongs in the cache key. CORS is answered at the edge by the response
+    # headers policy in `modules/cloudfront`, which derives `Access-Control-Allow-Origin` from the
+    # viewer's `Origin` on every response it serves - cache hits included - so the stored object
+    # neither needs to carry that header nor may be split per origin to get it right.
+    # `Access-Control-Request-Method` and `Access-Control-Request-Headers` are only ever sent on a
+    # preflight `OPTIONS`, which is in `allowed_methods` but not in `cached_methods` and so is never
+    # cached at all. `Referer` has no consumer: neither S3 nor the Tachyon origin-request Lambda@Edge
+    # reads it - Tachyon keys solely on the request path and the image query parameters.
+    #
+    # All four remain in the origin request policy below, so S3 and Tachyon still receive them
+    # unchanged; only the cache key drops them. Keying on them multiplied the entries per object by
+    # the product of their distinct values, which costs hit rate on exactly the small, frequently
+    # requested objects where it matters most.
     headers_config {
-      header_behavior = "whitelist"
-      headers {
-        items = [
-          "Origin",
-          "Access-Control-Request-Method",
-          "Access-Control-Request-Headers",
-          "Referer",
-        ]
-      }
+      header_behavior = "none"
     }
     query_strings_config {
       query_string_behavior = "allExcept"
