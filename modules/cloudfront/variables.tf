@@ -43,6 +43,11 @@ variable "cloudfront_minimum_protocol_version" {
   default = "TLSv1.2_2021"
 }
 
+variable "cloudfront_viewer_protocol_policy" {
+  type    = string
+  default = "redirect-to-https"
+}
+
 variable "cloudfront_cors_allow_origins" {
   type    = list(string)
   default = null

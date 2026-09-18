@@ -126,6 +126,7 @@ module "default_cloudfront" {
   cloudfront_price_class              = var.cloudfront_price_class
   cloudfront_domain                   = var.cloudfront_domain
   cloudfront_minimum_protocol_version = var.cloudfront_minimum_protocol_version
+  cloudfront_viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
   cloudfront_cors_allow_origins       = var.cloudfront_cors_allow_origins
   cloudfront_tachyon_qualified_arn    = module.lambdas.tachyon_qualified_arn
   cloudfront_public_web               = var.cloudfront_public_web
