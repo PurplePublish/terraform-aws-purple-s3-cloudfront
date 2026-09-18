@@ -103,6 +103,27 @@ variable "cloudfront_exclude_tracking_params" {
   default     = false
 }
 
+variable "cloudfront_additional_public_key_ids" {
+  description = <<-EOT
+    IDs of existing CloudFront public keys to trust alongside the key this module creates. They are
+    added to the module's key group, so every cache behavior that requires signed URLs accepts them.
+    The keys stay unmanaged - only their IDs are referenced - so a key shared with other distributions
+    is never owned by this module's state.
+
+    Set this when adopting the module for a distribution that already serves signed URLs. CloudFront
+    verifies a signed URL by looking up the `Key-Pair-Id` it carries among the keys in the key groups
+    attached to the behavior, so a newly created key is a different key even when its material is
+    byte-identical to the one in use: without listing the existing ID here, every URL signed with it is
+    rejected from the moment the distribution deploys, until whoever issues those URLs has been moved
+    to the new key. Listing it keeps both valid and makes that move a separate, reversible step.
+
+    CloudFront allows 5 public keys per key group and the module already uses two of them, so at most
+    three IDs fit here.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
 // ==========================================================================================================================
 // ACM
 // ==========================================================================================================================

@@ -110,7 +110,10 @@ resource "aws_cloudfront_origin_request_policy" "s3" {
 resource "aws_cloudfront_key_group" "default" {
   name    = var.bucket_name
   comment = "Public keys for ${var.bucket_name}"
-  items   = [aws_cloudfront_public_key.purple.id, module.lambdas.cloudfront_public_key_id]
+  items = concat(
+    [aws_cloudfront_public_key.purple.id, module.lambdas.cloudfront_public_key_id],
+    var.cloudfront_additional_public_key_ids,
+  )
 }
 
 module "default_cloudfront" {

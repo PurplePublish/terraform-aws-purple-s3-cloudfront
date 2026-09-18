@@ -9,6 +9,23 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.14] - 2026-09-18
+### Added
+- `cloudfront_additional_public_key_ids`, a list of existing CloudFront public key IDs to trust
+  alongside the key this module creates. They are appended to the module's key group, so every cache
+  behavior that requires signed URLs accepts them. The keys stay unmanaged - only their IDs are
+  referenced - so a key that other distributions depend on is never owned by this module's state.
+  This exists for adopting the module on a distribution that already serves signed URLs. CloudFront
+  verifies a signed URL by looking up the `Key-Pair-Id` it carries among the keys in the key groups
+  attached to the behavior, so the key this module creates is a different key even when its material
+  is byte-identical to the one already in use. Without the existing ID in this list, the trust set
+  changes the moment the distribution deploys and every URL signed with the old key is rejected until
+  whoever issues those URLs has been switched over - an outage for the duration of the cutover.
+  Listing the existing ID keeps both keys valid, which separates the apply from the key migration and
+  leaves the latter reversible. CloudFront allows 5 public keys per key group and the module already
+  uses two, so at most three IDs fit. **With the default `[]` this is a no-op: the key group keeps
+  exactly the members it had, so upgrading on its own does not touch the distribution.**
+
 ## [0.1.13] - 2026-09-17
 ### Changed
 - Drop `Origin`, `Access-Control-Request-Method`, `Access-Control-Request-Headers` and `Referer` from the
