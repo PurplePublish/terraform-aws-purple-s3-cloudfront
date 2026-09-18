@@ -81,6 +81,29 @@ variable "cloudfront_minimum_protocol_version" {
   default = "TLSv1.2_2021"
 }
 
+variable "cloudfront_viewer_protocol_policy" {
+  description = <<-EOT
+    How CloudFront answers a plain HTTP viewer request, for every cache behavior of the distribution.
+
+    The default redirects to HTTPS. Purple never issues HTTP URLs - signed CDN URLs are built with an
+    `https://` scheme - so a request that arrives over HTTP comes from a third party, an old hardcoded
+    link, or an absolute `http://` asset URL inside older content. Those keep working through the 301
+    at the cost of one extra round trip, while a signed URL that would otherwise have travelled in
+    cleartext - signature included, replayable until it expires - no longer does.
+
+    `https-only` answers HTTP with 403 instead of redirecting, which breaks those callers rather than
+    carrying them over; use it only for a distribution known to have none. `allow-all` was the default
+    before 0.1.15 and is what to set if a legacy client turns out not to follow the redirect.
+  EOT
+  type        = string
+  default     = "redirect-to-https"
+
+  validation {
+    condition     = contains(["redirect-to-https", "https-only", "allow-all"], var.cloudfront_viewer_protocol_policy)
+    error_message = "Must be one of redirect-to-https, https-only, allow-all."
+  }
+}
+
 variable "cloudfront_cors_allow_origins" {
   type    = list(string)
   default = null

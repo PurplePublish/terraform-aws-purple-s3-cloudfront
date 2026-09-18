@@ -1,6 +1,6 @@
 locals {
   behavior_defaults = {
-    viewer_protocol_policy     = "allow-all"
+    viewer_protocol_policy     = var.cloudfront_viewer_protocol_policy
     allowed_methods            = ["GET", "HEAD", "OPTIONS"]
     cached_methods             = ["GET", "HEAD"]
     compress                   = true

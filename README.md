@@ -12,6 +12,7 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 ## Cloudfront configuration
 
 * Default access using signed URLs
+* HTTP viewer requests are redirected to HTTPS (configurable via `cloudfront_viewer_protocol_policy`)
 * Following paths are publicly accessible:
     * \*/thumbnails/\*
     * /public/\*

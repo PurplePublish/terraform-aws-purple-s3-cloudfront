@@ -9,6 +9,20 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.1.15] - 2026-09-18
+### Changed
+- Answer plain HTTP viewer requests with a redirect to HTTPS instead of serving them, on every cache
+  behavior. `viewer_protocol_policy` had been `allow-all` since the module's first version - the AWS
+  console default of the time, carried forward rather than chosen. Purple never issues HTTP URLs, so
+  nothing of ours was being served that way: a request arriving over HTTP comes from a third party, an
+  old hardcoded link, or an absolute `http://` asset URL inside older content. Those keep working
+  through the 301 at the cost of one extra round trip, while a signed URL requested over HTTP no
+  longer travels in cleartext with its signature attached, replayable until it expires.
+  The new `cloudfront_viewer_protocol_policy` variable sets this per distribution: `https-only`
+  answers HTTP with 403 rather than redirecting, and `allow-all` restores the previous behavior for a
+  legacy client that turns out not to follow the redirect. **Applying this triggers a CloudFront
+  distribution deployment, which takes a few minutes to propagate; cached objects are unaffected.**
+
 ## [0.1.14] - 2026-09-18
 ### Added
 - `cloudfront_additional_public_key_ids`, a list of existing CloudFront public key IDs to trust
