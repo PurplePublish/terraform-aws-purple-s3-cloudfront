@@ -1,0 +1,172 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Bucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:GetBucketPolicy",
+        "s3:PutBucketPolicy",
+        "s3:DeleteBucketPolicy",
+        "s3:GetBucketPublicAccessBlock",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:GetBucketOwnershipControls",
+        "s3:PutBucketOwnershipControls",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning",
+        "s3:GetBucketCORS",
+        "s3:PutBucketCORS",
+        "s3:GetLifecycleConfiguration",
+        "s3:PutLifecycleConfiguration",
+        "s3:GetBucketTagging",
+        "s3:PutBucketTagging",
+        "s3:ListTagsForResource",
+        "s3:TagResource",
+        "s3:UntagResource",
+        "s3:GetAccelerateConfiguration",
+        "s3:GetBucketAcl",
+        "s3:GetBucketLogging",
+        "s3:GetBucketObjectLockConfiguration",
+        "s3:GetBucketRequestPayment",
+        "s3:GetBucketWebsite",
+        "s3:GetEncryptionConfiguration",
+        "s3:GetReplicationConfiguration"
+      ],
+      "Resource": "arn:aws:s3:::BUCKET_NAME"
+    },
+    {
+      "Sid": "CloudFront",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:CreateDistribution",
+        "cloudfront:GetDistribution",
+        "cloudfront:UpdateDistribution",
+        "cloudfront:DeleteDistribution",
+        "cloudfront:ListTagsForResource",
+        "cloudfront:TagResource",
+        "cloudfront:UntagResource",
+        "cloudfront:CreateOriginAccessControl",
+        "cloudfront:GetOriginAccessControl",
+        "cloudfront:UpdateOriginAccessControl",
+        "cloudfront:DeleteOriginAccessControl",
+        "cloudfront:CreateCachePolicy",
+        "cloudfront:GetCachePolicy",
+        "cloudfront:UpdateCachePolicy",
+        "cloudfront:DeleteCachePolicy",
+        "cloudfront:CreateOriginRequestPolicy",
+        "cloudfront:GetOriginRequestPolicy",
+        "cloudfront:UpdateOriginRequestPolicy",
+        "cloudfront:DeleteOriginRequestPolicy",
+        "cloudfront:CreateResponseHeadersPolicy",
+        "cloudfront:GetResponseHeadersPolicy",
+        "cloudfront:UpdateResponseHeadersPolicy",
+        "cloudfront:DeleteResponseHeadersPolicy",
+        "cloudfront:CreatePublicKey",
+        "cloudfront:GetPublicKey",
+        "cloudfront:UpdatePublicKey",
+        "cloudfront:DeletePublicKey",
+        "cloudfront:CreateKeyGroup",
+        "cloudfront:GetKeyGroup",
+        "cloudfront:UpdateKeyGroup",
+        "cloudfront:DeleteKeyGroup"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EdgeFunctions",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:GetFunctionCodeSigningConfig",
+        "lambda:ListVersionsByFunction",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:PublishVersion",
+        "lambda:DeleteFunction",
+        "lambda:TagResource",
+        "lambda:UntagResource",
+        "lambda:EnableReplication",
+        "lambda:DisableReplication"
+      ],
+      "Resource": [
+        "arn:aws:lambda:us-east-1:*:function:tachyon-BUCKET_NAME",
+        "arn:aws:lambda:us-east-1:*:function:tachyon-BUCKET_NAME:*",
+        "arn:aws:lambda:us-east-1:*:function:purple-web-BUCKET_NAME",
+        "arn:aws:lambda:us-east-1:*:function:purple-web-BUCKET_NAME:*"
+      ]
+    },
+    {
+      "Sid": "EdgeFunctionLogGroups",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteLogGroup",
+        "logs:ListTagsForResource",
+        "logs:TagResource",
+        "logs:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.tachyon-BUCKET_NAME",
+        "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.tachyon-BUCKET_NAME:*",
+        "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.purple-web-BUCKET_NAME",
+        "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/us-east-1.purple-web-BUCKET_NAME:*"
+      ]
+    },
+    {
+      "Sid": "SignedCookieKeyParameters",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter",
+        "ssm:GetParameter",
+        "ssm:DeleteParameter",
+        "ssm:ListTagsForResource",
+        "ssm:AddTagsToResource",
+        "ssm:RemoveTagsFromResource"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:*:parameter/purple/cloudfront/lambda/purple-web-BUCKET_NAME/*"
+    },
+    {
+      "Sid": "CustomDomainCertificate",
+      "Effect": "Allow",
+      "Action": [
+        "acm:DescribeCertificate",
+        "acm:ListTagsForCertificate",
+        "acm:AddTagsToCertificate",
+        "acm:RemoveTagsFromCertificate",
+        "acm:DeleteCertificate"
+      ],
+      "Resource": "arn:aws:acm:us-east-1:*:certificate/*"
+    },
+    {
+      "Sid": "CustomDomainValidationRecords",
+      "Effect": "Allow",
+      "Action": [
+        "route53:GetHostedZone",
+        "route53:ListResourceRecordSets",
+        "route53:ChangeResourceRecordSets",
+        "route53:GetChange"
+      ],
+      "Resource": [
+        "arn:aws:route53:::hostedzone/*",
+        "arn:aws:route53:::change/*"
+      ]
+    },
+    {
+      "Sid": "NoResourceLevelScope",
+      "Effect": "Allow",
+      "Action": [
+        "acm:RequestCertificate",
+        "logs:DescribeLogGroups",
+        "ssm:DescribeParameters"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
