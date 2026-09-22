@@ -9,6 +9,18 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [Unreleased]
+### Added
+- `deploy-policy-cdn.json` and `deploy-policy-iam.json`, identity policies with the permissions needed to plan, apply
+  and destroy this module, documented in the README under "Required IAM permissions". They are scoped to the exact
+  resource names the module derives from `bucket_name`, written as a `BUCKET_NAME` placeholder that has to be
+  replaced before use, so an unedited copy grants nothing on those resources instead of everything that shares a name
+  prefix. The read set follows the calls the AWS provider makes on refresh, including the S3 Control
+  `ListTagsForResource` call used for bucket tags, and the update path includes `lambda:EnableReplication`, which
+  associating a Lambda@Edge function with a distribution requires. The IAM grants (user, access key, policy and
+  function role) are in their own file so they can be reviewed and bounded on their own; together the two files come
+  close to the 6,144-character limit for a managed policy.
+
 ## [0.3.0] - 2026-10-01
 ### Removed
 - Remove the signed-cookies Lambda@Edge function (`purple-web-<bucket_name>`), its IAM role, log
