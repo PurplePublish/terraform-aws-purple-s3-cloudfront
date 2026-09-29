@@ -74,6 +74,26 @@ module "bucket" {
         }
       ]
     },
+    # Non-current versions are only read to undo an overwrite or deletion. They keep the class they
+    # had while current - Intelligent-Tiering, or Standard if overwritten before the day-0 transition
+    # ran - and Glacier Instant Retrieval undercuts both. The per-object transition fee only pays off
+    # above a size threshold, see bucket_noncurrent_version_transition_min_size. Separate from
+    # automatic-cleanup so it still applies when cleanup is disabled.
+    {
+      id      = "noncurrent-versions"
+      enabled = true
+
+      filter = {
+        object_size_greater_than = var.bucket_noncurrent_version_transition_min_size
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 0
+          storage_class = "GLACIER_IR"
+        }
+      ]
+    },
     {
       id                                     = "automatic-cleanup"
       enabled                                = var.bucket_automatic_cleanup_enabled

@@ -32,9 +32,32 @@ variable "bucket_automatic_cleanup_enabled" {
 }
 
 variable "bucket_automatic_cleanup_days" {
-  description = "How many days should deleted objects be kept"
+  description = <<-EOT
+    How many days a non-current object version - one that has been overwritten or deleted - is kept
+    before it expires. This is the window in which an overwrite or deletion can be undone.
+
+    Versioning stores roughly the monthly overwrite volume times (days / 30) in non-current versions.
+    Versions above bucket_noncurrent_version_transition_min_size move to Glacier Instant Retrieval,
+    whose 90-day minimum storage duration this default matches; a shorter value still expires them on
+    time, but they are billed for 90 days.
+  EOT
   type        = number
-  default     = 400
+  default     = 90
+}
+
+variable "bucket_noncurrent_version_transition_min_size" {
+  description = <<-EOT
+    Size in bytes above which a non-current version is moved to Glacier Instant Retrieval. Smaller
+    versions stay in the class they had while current.
+
+    Each move costs a lifecycle transition request (about $0.02 per 1,000), which a version only earns
+    back through the storage saving if it is large enough. The saving depends on the retention: over
+    the default 90 days it is about $0.035/GB against Intelligent-Tiering, which puts the break-even
+    at roughly 0.35-0.55 MB. With a shorter bucket_automatic_cleanup_days the saving shrinks, because
+    Glacier Instant Retrieval bills a minimum of 90 days - at 35 days the break-even is about 1.5 MB.
+  EOT
+  type        = number
+  default     = 524288
 }
 
 variable "bucket_automatic_cleanup_multipart_upload_days" {

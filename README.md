@@ -8,6 +8,9 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 
 * Private
 * Access allowed for Cloudfront distribution
+* Versioned; current versions in Intelligent-Tiering, non-current versions above 512 KiB in Glacier
+  Instant Retrieval and, with automatic cleanup enabled, expired after 90 days
+  (`bucket_automatic_cleanup_days`)
 
 ## Cloudfront configuration
 

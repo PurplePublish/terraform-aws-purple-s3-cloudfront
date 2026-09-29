@@ -9,6 +9,21 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.2.0] - 2026-09-29
+### Changed
+- Move non-current object versions above 512 KiB to Glacier Instant Retrieval as soon as they become
+  non-current, and keep non-current versions for 90 days instead of 400 by default
+  (`bucket_automatic_cleanup_days`). Until now they kept the class they had while current -
+  Intelligent-Tiering, or Standard if overwritten before the day-0 transition ran. Smaller versions
+  stay where they are, since the per-object transition fee outweighs the saving;
+  `bucket_noncurrent_version_transition_min_size` sets the threshold. **Applying this expires every
+  non-current version older than 90 days on an existing bucket; set
+  `bucket_automatic_cleanup_days = 400` to keep the previous retention.**
+
+## [0.1.16] - 2026-09-22
+### Changed
+- Update the Tachyon Lambda@Edge package to `r53`.
+
 ## [0.1.15] - 2026-09-18
 ### Changed
 - Answer plain HTTP viewer requests with a redirect to HTTPS instead of serving them, on every cache
