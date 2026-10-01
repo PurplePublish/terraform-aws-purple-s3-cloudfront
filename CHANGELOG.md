@@ -9,6 +9,19 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.3.0] - 2026-10-01
+### Removed
+- Remove the signed-cookies Lambda@Edge function (`purple-web-<bucket_name>`), its IAM role, log
+  group and SSM parameters, its CloudFront public key, and the `cookies_qualified_arn` and
+  `cloudfront_public_key_id` outputs of the `lambdas` sub-module. The root module's
+  `cloudfront_public_key_id` output (the module's own signing key) is unchanged. The key group now
+  holds one key of its own, so `cloudfront_additional_public_key_ids` takes up to four IDs. Nothing
+  has attached the function to a distribution since 0.0.40: web content (`*.pkar/web/*`) is served
+  without signatures, from a distribution with `cloudfront_public_web = true`. Its public key was
+  still in the trusted key group, so the private key in SSM could sign URLs for the whole
+  distribution. **Applying this deletes those resources and removes the key from the key group; URLs
+  signed with that key stop working.**
+
 ## [0.2.1] - 2026-10-01
 ### Changed
 - Keep the Tachyon Lambda@Edge function when the stack is destroyed (`skip_destroy`). CloudFront
