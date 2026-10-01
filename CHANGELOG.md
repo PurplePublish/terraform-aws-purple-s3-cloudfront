@@ -9,6 +9,17 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [0.2.1] - 2026-10-01
+### Changed
+- Keep the Tachyon Lambda@Edge function when the stack is destroyed (`skip_destroy`). CloudFront
+  keeps replicas of an edge function for hours after its distribution is deleted, and until they are
+  gone the function cannot be deleted, so `terraform destroy` failed on it. The destroy now only
+  removes it from the state; delete it by hand once the replicas are gone, or close the account.
+  Until then, re-creating the stack with the same `bucket_name` in the same account fails because the
+  function still exists. **This only takes effect after one regular apply with this version, because
+  the provider reads `skip_destroy` from the state at destroy time: a stack that goes straight from
+  an older version to `terraform destroy` still fails on Tachyon.**
+
 ## [0.2.0] - 2026-09-29
 ### Changed
 - Move non-current object versions above 512 KiB to Glacier Instant Retrieval as soon as they become
