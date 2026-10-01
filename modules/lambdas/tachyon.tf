@@ -46,4 +46,12 @@ module "tachyon" {
   attach_policy_jsons               = true
   number_of_policy_jsons            = 1
   policy_jsons                      = [data.aws_iam_policy_document.tachyon_bucket.json]
+
+  # CloudFront keeps replicas of an edge function for hours after its distribution is gone, and
+  # the function cannot be deleted until they are, so destroying the stack only removes it from the
+  # state. Once the replicas are gone it can be deleted by hand
+  # (`aws lambda delete-function --region us-east-1 --function-name tachyon-<bucket_name>`), or with
+  # the AWS account. Until then, applying the stack again with the same bucket_name fails with
+  # "Function already exist".
+  skip_destroy = true
 }
