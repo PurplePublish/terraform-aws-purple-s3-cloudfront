@@ -163,8 +163,8 @@ variable "cloudfront_additional_public_key_ids" {
     rejected from the moment the distribution deploys, until whoever issues those URLs has been moved
     to the new key. Listing it keeps both valid and makes that move a separate, reversible step.
 
-    CloudFront allows 5 public keys per key group and the module already uses two of them, so at most
-    three IDs fit here.
+    CloudFront allows 5 public keys per key group and the module already uses one of them, so at most
+    four IDs fit here.
   EOT
   type        = list(string)
   default     = []

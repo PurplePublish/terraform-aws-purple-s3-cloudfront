@@ -111,7 +111,7 @@ resource "aws_cloudfront_key_group" "default" {
   name    = var.bucket_name
   comment = "Public keys for ${var.bucket_name}"
   items = concat(
-    [aws_cloudfront_public_key.purple.id, module.lambdas.cloudfront_public_key_id],
+    [aws_cloudfront_public_key.purple.id],
     var.cloudfront_additional_public_key_ids,
   )
 }
