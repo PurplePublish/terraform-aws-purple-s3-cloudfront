@@ -6,7 +6,7 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 
 ## Bucket configuration
 
-* Private
+* Private: public object ACLs are ignored and public bucket policies refused (S3 Block Public Access)
 * Access allowed for Cloudfront distribution
 * Versioned; current versions in Intelligent-Tiering, non-current versions above 512 KiB in Glacier
   Instant Retrieval and, with automatic cleanup enabled, expired after 90 days

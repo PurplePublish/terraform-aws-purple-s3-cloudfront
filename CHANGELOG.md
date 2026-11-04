@@ -33,6 +33,21 @@ Entries are derived from the Git tags of this repository.
   still run the previous build, whose cache writes then fail. A resized URL first requested at such
   an edge in that window gets the original, full-size image, and CloudFront keeps it cached under
   that URL for the original's max-age. Invalidate the affected paths if that matters.**
+- **Breaking:** enable `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` on
+  the bucket. Content was meant to be reachable only through CloudFront, but object ACLs are
+  evaluated separately from the bucket policy, so an object with a `public-read` ACL could be
+  fetched straight from the S3 endpoint, without a signed URL. S3 now ignores every public ACL, refuses a public bucket policy and
+  limits one attached outside Terraform to this account.
+  **Applying this makes objects that carry a `public-read` ACL today, which includes many older
+  uploads, unreadable directly from S3; through CloudFront nothing changes.** Anything that still
+  links to such objects with a plain S3 URL, for example one built from the
+  `s3_bucket_bucket_domain_name` or `s3_bucket_bucket_regional_domain_name` output, gets 403.
+  `block_public_acls` stays off and ACLs stay enabled, so uploads that still send `public-read` are
+  accepted; their ACL is ignored.
+- **Breaking:** `bucket_additional_cloudfront_arns` now accepts only exact distribution ARNs. A
+  wildcard or policy variable would make the bucket policy public, which the public access block
+  refuses; any other value would match no distribution.
+- Declare Terraform 1.5.7 as the minimum version, which the sub-modules already required.
 
 ## [0.3.0] - 2026-10-01
 ### Removed

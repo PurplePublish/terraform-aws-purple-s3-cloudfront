@@ -41,6 +41,15 @@ data "aws_iam_policy_document" "bucket" {
   }
 }
 
+# Bucket content is served only through CloudFront. A public-read object ACL would bypass that: S3
+# evaluates ACLs separately from the bucket policy, so such an object is readable straight from
+# the S3 endpoint, without a signed URL. ignore_public_acls makes S3 disregard every public ACL, on
+# existing objects too. block_public_policy refuses a bucket policy that grants public access, and
+# restrict_public_buckets limits a public policy attached outside Terraform to this account. ACL
+# grants to specific AWS accounts are not public and still apply until ACLs are disabled.
+#
+# block_public_acls stays false, and ACLs stay enabled (BucketOwnerPreferred), while uploaders
+# still send public-read: with either one S3 rejects those uploads instead of ignoring their ACL.
 module "bucket" {
   source                   = "terraform-aws-modules/s3-bucket/aws"
   version                  = "5.10.0"
@@ -49,9 +58,9 @@ module "bucket" {
   attach_policy            = true
   policy                   = data.aws_iam_policy_document.bucket.json
   block_public_acls        = false
-  block_public_policy      = false
-  ignore_public_acls       = false
-  restrict_public_buckets  = false
+  block_public_policy      = true
+  ignore_public_acls       = true
+  restrict_public_buckets  = true
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
 
