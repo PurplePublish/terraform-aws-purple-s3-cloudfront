@@ -1,28 +1,27 @@
+# Only what Tachyon does (purple-ds-hub-tachyon, src/tachyon.js): GetObject for a cached derivative
+# and for the original, PutObject to cache the derivative under resized/. ListBucket lets a missing
+# key answer 404 rather than 403. Nothing else - in particular no DeleteObject, no ACL actions and no
+# writes outside resized/ - so a bug or a compromise in a function that runs at every edge location
+# cannot delete, overwrite or publish customer content. A missing permission here does not fail
+# loudly: Tachyon then serves the original image and resizes again on every request.
 data "aws_iam_policy_document" "tachyon_bucket" {
   statement {
-    sid       = "AllowListBucketContents"
+    sid       = "AllowListBucket"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
     resources = [var.bucket_arn]
   }
   statement {
-    sid    = "AllowModificationsToBucket"
-    effect = "Allow"
-    actions = [
-      "s3:AbortMultipartUpload",
-      "s3:DeleteObject",
-      "s3:GetBucketAcl",
-      "s3:GetBucketLocation",
-      "s3:GetBucketPolicy",
-      "s3:GetObject",
-      "s3:GetObjectAcl",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts",
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
+    sid       = "AllowReadObjects"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
     resources = ["${var.bucket_arn}/*"]
+  }
+  statement {
+    sid       = "AllowWriteResizedObjects"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${var.bucket_arn}/resized/*"]
   }
 }
 
@@ -41,7 +40,7 @@ module "tachyon" {
   lambda_at_edge                    = true
   publish                           = true
   create_package                    = false
-  local_existing_package            = "${path.module}/lambda/tachyon/tachyon-r53.zip"
+  local_existing_package            = "${path.module}/lambda/tachyon/tachyon-r56.zip"
   cloudwatch_logs_retention_in_days = 30
   attach_policy_jsons               = true
   number_of_policy_jsons            = 1

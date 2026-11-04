@@ -4,6 +4,9 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Lock files: a reusable module leaves provider pinning to the stacks that use it
+.terraform.lock.hcl
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
