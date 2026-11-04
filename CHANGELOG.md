@@ -20,6 +20,19 @@ Entries are derived from the Git tags of this repository.
   associating a Lambda@Edge function with a distribution requires. The IAM grants (user, access key, policy and
   function role) are in their own file so they can be reviewed and bounded on their own; together the two files come
   close to the 6,144-character limit for a managed policy.
+### Changed
+- Reduce the Tachyon Lambda@Edge role's S3 access to what Tachyon does: `s3:ListBucket` on the
+  bucket, `s3:GetObject` on its objects and `s3:PutObject` under `resized/`. It no longer holds
+  `s3:DeleteObject`, `s3:PutObjectAcl`, `s3:GetObjectAcl` or the multipart actions on the whole
+  bucket, and five bucket-level actions that were granted on the object ARN, and so granted nothing,
+  are gone. A bug or a compromise in the resizer can no longer delete, overwrite or publish customer
+  content.
+- Update Tachyon to r56, which writes resized images without the `public-read` ACL. Resized
+  objects written from now on are readable only through CloudFront; those written before keep their
+  `public-read` ACL. **During the rollout, the reduced policy can take effect while edge replicas
+  still run the previous build, whose cache writes then fail. A resized URL first requested at such
+  an edge in that window gets the original, full-size image, and CloudFront keeps it cached under
+  that URL for the original's max-age. Invalidate the affected paths if that matters.**
 
 ## [0.3.0] - 2026-10-01
 ### Removed
