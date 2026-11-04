@@ -29,7 +29,7 @@ Entries are derived from the Git tags of this repository.
   content.
 - Update Tachyon to r56, which writes resized images without the `public-read` ACL. Resized
   objects written from now on are readable only through CloudFront; those written before keep their
-  `public-read` ACL. **During the rollout, the reduced policy can take effect while edge replicas
+  `public-read` ACL, which S3 ignores once the public access block below is applied. **During the rollout, the reduced policy can take effect while edge replicas
   still run the previous build, whose cache writes then fail. A resized URL first requested at such
   an edge in that window gets the original, full-size image, and CloudFront keeps it cached under
   that URL for the original's max-age. Invalidate the affected paths if that matters.**
