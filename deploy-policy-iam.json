@@ -60,7 +60,8 @@
         "iam:CreateAccessKey",
         "iam:DeleteAccessKey",
         "iam:ListAccessKeys",
-        "iam:ListAttachedUserPolicies"
+        "iam:ListAttachedUserPolicies",
+        "iam:ListGroupsForUser"
       ],
       "Resource": "arn:aws:iam::*:user/BUCKET_NAME"
     },

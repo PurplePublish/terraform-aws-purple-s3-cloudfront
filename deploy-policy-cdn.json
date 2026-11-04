@@ -88,6 +88,7 @@
         "lambda:UpdateFunctionCode",
         "lambda:UpdateFunctionConfiguration",
         "lambda:PublishVersion",
+        "lambda:ListTags",
         "lambda:TagResource",
         "lambda:UntagResource",
         "lambda:EnableReplication",

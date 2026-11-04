@@ -58,6 +58,10 @@ Some grants are easy to get wrong:
 * `lambda:EnableReplication` and `lambda:DisableReplication` on the function version are needed by whoever creates
   or updates the *distribution*, because associating a Lambda@Edge function replicates it. Without them the function
   and the distribution both plan cleanly and `CreateDistribution` / `UpdateDistribution` then fails.
+* `lambda:ListTags` never shows up as a call of its own: `GetFunction` returns the function's tags only to a principal
+  that is allowed it. Without it the tags read back empty, and with provider `default_tags` every plan shows a tag diff
+  that no apply clears.
+* `iam:ListGroupsForUser` is called on every destroy of the IAM user, whether or not `force_destroy` is set.
 * The Lambda function, its log group and the ACM certificate are always in `us-east-1`, whatever `bucket_region` is.
   A principal fenced with an `aws:RequestedRegion` condition needs `us-east-1` in addition to the bucket's region.
 * There is no `lambda:DeleteFunction`. The Tachyon function is kept on destroy (`skip_destroy`) and has to be deleted
