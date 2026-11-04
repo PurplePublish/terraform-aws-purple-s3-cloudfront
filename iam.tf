@@ -16,7 +16,8 @@ resource "aws_iam_policy" "bucket" {
     {
         "Effect": "Allow",
         "Action": [
-            "polly:*"
+            "polly:StartSpeechSynthesisTask",
+            "polly:GetSpeechSynthesisTask"
         ],
         "Resource": [
             "*"
@@ -38,7 +39,8 @@ resource "aws_iam_policy" "bucket" {
         "s3:PutObjectAcl",
         "s3:GetObjectAcl",
         "s3:DeleteObject",
-        "s3:GetObject"
+        "s3:GetObject",
+        "s3:AbortMultipartUpload"
       ],
       "Resource": "${module.bucket.s3_bucket_arn}/*"
     }

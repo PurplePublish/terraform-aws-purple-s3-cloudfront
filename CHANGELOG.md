@@ -53,6 +53,15 @@ Entries are derived from the Git tags of this repository.
   wildcard or policy variable would make the bucket policy public, which the public access block
   refuses; any other value would match no distribution.
 - Declare Terraform 1.5.7 as the minimum version, which the sub-modules already required.
+- Narrow the Polly statement of the per-bucket app user policy `s3-<bucket>` from `polly:*` to
+  `polly:StartSpeechSynthesisTask` and `polly:GetSpeechSynthesisTask`, the only two calls the TTS
+  path makes. `polly:*` on `*` also allowed `PutLexicon` and `DeleteLexicon`, which are account-wide
+  and shared by every tenant.
+- Allow `s3:AbortMultipartUpload` for the app user, so a client can clean up its own failed or
+  cancelled multipart upload instead of leaving the parts to the incomplete-upload lifecycle rule.
+  **Applying this changes the IAM policy in place; no resource is replaced. Any Polly call other
+  than the two listed (for example `SynthesizeSpeech`, or lexicon access) now fails with
+  `AccessDenied`, so check TTS synthesis on a non-production bucket before rolling it out.**
 
 ## [0.3.0] - 2026-10-01
 ### Removed
