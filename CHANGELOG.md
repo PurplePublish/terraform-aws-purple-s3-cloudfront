@@ -9,7 +9,7 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
-## [Unreleased]
+## [0.4.0] - 2026-11-04
 ### Added
 - `deploy-policy-cdn.json` and `deploy-policy-iam.json`, identity policies with the permissions needed to plan, apply
   and destroy this module, documented in the README under "Required IAM permissions". They are scoped to the exact
