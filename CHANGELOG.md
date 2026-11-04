@@ -29,10 +29,30 @@ Entries are derived from the Git tags of this repository.
   content.
 - Update Tachyon to r56, which writes resized images without the `public-read` ACL. Resized
   objects written from now on are readable only through CloudFront; those written before keep their
-  `public-read` ACL. **During the rollout, the reduced policy can take effect while edge replicas
+  `public-read` ACL, which S3 ignores once the public access block below is applied. **During the rollout, the reduced policy can take effect while edge replicas
   still run the previous build, whose cache writes then fail. A resized URL first requested at such
   an edge in that window gets the original, full-size image, and CloudFront keeps it cached under
   that URL for the original's max-age. Invalidate the affected paths if that matters.**
+- **Breaking:** enable `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` on
+  the bucket. Content was meant to be reachable only through CloudFront, but object ACLs are
+  evaluated separately from the bucket policy, so an object with a `public-read` ACL could be
+  fetched straight from the S3 endpoint, without a signed URL. S3 now ignores every public ACL,
+  refuses a public bucket policy and limits one attached outside Terraform to this account.
+  **Applying this makes every object unreadable directly from S3, including new uploads that send
+  `public-read` and older objects that carry it; through CloudFront nothing changes.** Anything
+  that links to objects with a plain S3 URL, for example one built from the
+  `s3_bucket_bucket_domain_name` or `s3_bucket_bucket_regional_domain_name` output, gets 403. This
+  includes Purple Manager's bucket access check for a bucket definition without a read endpoint: it
+  uploads a `public-read` test file and reads it back unsigned from S3, so the check fails, and with
+  it enabling and publishing git apps, cloning them, moving teams with git apps and bucket
+  migration. Set the bucket definition's read endpoint to the CloudFront domain before applying;
+  Purple Manager then checks through CloudFront instead.
+  `block_public_acls` stays off and ACLs stay enabled, so uploads that still send `public-read` are
+  accepted; their ACL is ignored.
+- **Breaking:** `bucket_additional_cloudfront_arns` now accepts only exact distribution ARNs. A
+  wildcard or policy variable would make the bucket policy public, which the public access block
+  refuses; any other value would match no distribution.
+- Declare Terraform 1.5.7 as the minimum version, which the sub-modules already required.
 
 ## [0.3.0] - 2026-10-01
 ### Removed

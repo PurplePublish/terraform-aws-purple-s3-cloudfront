@@ -22,8 +22,17 @@ variable "bucket_iam_user_name" {
 }
 
 variable "bucket_additional_cloudfront_arns" {
-  type    = list(string)
-  default = []
+  type     = list(string)
+  default  = []
+  nullable = false
+
+  validation {
+    # S3 treats a bucket policy whose AWS:SourceArn holds a wildcard or a policy variable as public,
+    # and the bucket's public access block refuses it; anything else that is not a distribution ARN
+    # would match no distribution
+    condition     = alltrue([for arn in var.bucket_additional_cloudfront_arns : can(regex("^arn:aws[a-z-]*:cloudfront::[0-9]{12}:distribution/[A-Z0-9]+$", arn))])
+    error_message = "bucket_additional_cloudfront_arns must hold exact CloudFront distribution ARNs, without wildcards or policy variables."
+  }
 }
 
 variable "bucket_automatic_cleanup_enabled" {
