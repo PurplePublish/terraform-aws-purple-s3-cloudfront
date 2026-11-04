@@ -36,12 +36,17 @@ Entries are derived from the Git tags of this repository.
 - **Breaking:** enable `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` on
   the bucket. Content was meant to be reachable only through CloudFront, but object ACLs are
   evaluated separately from the bucket policy, so an object with a `public-read` ACL could be
-  fetched straight from the S3 endpoint, without a signed URL. S3 now ignores every public ACL, refuses a public bucket policy and
-  limits one attached outside Terraform to this account.
-  **Applying this makes objects that carry a `public-read` ACL today, which includes many older
-  uploads, unreadable directly from S3; through CloudFront nothing changes.** Anything that still
-  links to such objects with a plain S3 URL, for example one built from the
-  `s3_bucket_bucket_domain_name` or `s3_bucket_bucket_regional_domain_name` output, gets 403.
+  fetched straight from the S3 endpoint, without a signed URL. S3 now ignores every public ACL,
+  refuses a public bucket policy and limits one attached outside Terraform to this account.
+  **Applying this makes every object unreadable directly from S3, including new uploads that send
+  `public-read` and older objects that carry it; through CloudFront nothing changes.** Anything
+  that links to objects with a plain S3 URL, for example one built from the
+  `s3_bucket_bucket_domain_name` or `s3_bucket_bucket_regional_domain_name` output, gets 403. This
+  includes Purple Manager's bucket access check for a bucket definition without a read endpoint: it
+  uploads a `public-read` test file and reads it back unsigned from S3, so the check fails, and with
+  it enabling and publishing git apps, cloning them, moving teams with git apps and bucket
+  migration. Set the bucket definition's read endpoint to the CloudFront domain before applying;
+  Purple Manager then checks through CloudFront instead.
   `block_public_acls` stays off and ACLs stay enabled, so uploads that still send `public-read` are
   accepted; their ACL is ignored.
 - **Breaking:** `bucket_additional_cloudfront_arns` now accepts only exact distribution ARNs. A
