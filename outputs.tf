@@ -25,6 +25,11 @@ output "s3_bucket_hosted_zone_id" {
   value = module.bucket.s3_bucket_hosted_zone_id
 }
 
+output "s3_bucket_public_access_block" {
+  description = "The bucket's S3 Block Public Access flags as configured by bucket_block_public_access"
+  value       = local.bucket_public_access_block
+}
+
 output "s3_user_name" {
   value = aws_iam_user.default.name
 }

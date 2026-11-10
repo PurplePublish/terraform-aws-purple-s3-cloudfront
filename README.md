@@ -6,7 +6,13 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 
 ## Bucket configuration
 
-* Private: public object ACLs are ignored and public bucket policies refused (S3 Block Public Access)
+* Public access block (opt-in): with `bucket_block_public_access = true`, public object ACLs are ignored and public
+  bucket policies refused (S3 Block Public Access), so objects are no longer publicly readable from the S3 endpoint.
+  It is off by default, so an object uploaded with a public-read ACL is readable straight from the S3 endpoint,
+  without CloudFront or a signed URL. Turn it on once no uploader sends public-read ACLs and nothing reads objects
+  through the S3 endpoint. The switch covers `ignore_public_acls`, `block_public_policy` and
+  `restrict_public_buckets`; `block_public_acls` stays false either way, since with it S3 rejects a public-read
+  upload instead of ignoring its ACL. The configured flags are the `s3_bucket_public_access_block` output.
 * Access allowed for Cloudfront distribution
 * Versioned; current versions in Intelligent-Tiering, non-current versions above 512 KiB in Glacier
   Instant Retrieval and, with automatic cleanup enabled, expired after 90 days

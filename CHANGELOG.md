@@ -9,6 +9,17 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [Unreleased]
+### Added
+- `bucket_block_public_access` switches `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` of
+  the bucket together, and the `s3_bucket_public_access_block` output reports the flags as configured.
+  `block_public_acls` stays false either way.
+### Changed
+- **Breaking against 0.4.0:** the public access block from 0.4.0 is now opt-in. `bucket_block_public_access` defaults
+  to `false`, which is how the bucket behaved before 0.4.0, so public-read object ACLs are honoured again. Buckets
+  whose uploaders no longer send them keep the 0.4.0 lock-down by setting `bucket_block_public_access = true`; a caller
+  on 0.4.0 that moves to this release without setting it loses the lock-down on the next apply.
+
 ## [0.4.0] - 2026-11-04
 ### Added
 - `deploy-policy-cdn.json` and `deploy-policy-iam.json`, identity policies with the permissions needed to plan, apply
