@@ -13,12 +13,9 @@ Entries are derived from the Git tags of this repository.
 ### Added
 - `bucket_block_public_access` switches `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` of
   the bucket together, and the `s3_bucket_public_access_block` output reports the flags as configured.
-  `block_public_acls` stays false either way.
-### Changed
-- **Breaking against 0.4.0:** the public access block from 0.4.0 is now opt-in. `bucket_block_public_access` defaults
-  to `false`, which is how the bucket behaved before 0.4.0, so public-read object ACLs are honoured again. Buckets
-  whose uploaders no longer send them keep the 0.4.0 lock-down by setting `bucket_block_public_access = true`; a caller
-  on 0.4.0 that moves to this release without setting it loses the lock-down on the next apply.
+  `block_public_acls` stays false either way. It defaults to `true`, the lock-down from 0.4.0, so callers on 0.4.0
+  are unchanged. Setting it to `false` gives the behaviour from before 0.4.0, with public-read object ACLs honoured
+  again, for buckets whose uploaders still send them.
 
 ## [0.4.0] - 2026-11-04
 ### Added

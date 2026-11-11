@@ -52,9 +52,9 @@ data "aws_iam_policy_document" "bucket" {
 # block_public_acls stays false, and ACLs stay enabled (BucketOwnerPreferred), while uploaders
 # still send public-read: with either one S3 rejects those uploads instead of ignoring their ACL.
 #
-# bucket_block_public_access switches the three flags together and is off by default, which is how
-# the bucket behaved before 0.4.0: public object ACLs are honoured again. Turn it on once no uploader
-# sends public-read any more and nothing reads objects through the S3 endpoint.
+# bucket_block_public_access switches the three flags together and is on by default. Turning it off
+# gives the behaviour from before 0.4.0, public object ACLs honoured again, for buckets whose uploaders
+# still send public-read or whose readers still use the resulting S3 URLs.
 locals {
   bucket_public_access_block = {
     block_public_acls       = false

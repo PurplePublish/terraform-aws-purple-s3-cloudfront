@@ -1,7 +1,8 @@
 # The bucket's S3 Block Public Access settings are switched together by bucket_block_public_access.
-# Off (the default) is what the module did before 0.4.0: public object ACLs are honoured, which
-# buckets whose uploaders still send public-read need. On is the 0.4.0 lock-down. block_public_acls
-# stays false either way, because with it S3 rejects a public-read upload instead of ignoring it.
+# On (the default) is the lock-down introduced in 0.4.0. Off is what the module did before 0.4.0:
+# public object ACLs are honoured, which buckets whose uploaders still send public-read need.
+# block_public_acls stays false either way, because with it S3 rejects a public-read upload instead
+# of ignoring it.
 #
 # The flags are read from the s3_bucket_public_access_block output, which is built from the same
 # local that module "bucket" is configured with: resources inside a child module are not addressable
@@ -28,17 +29,17 @@ variables {
   bucket_name = "purple-files-test"
 }
 
-run "public_access_is_not_blocked_by_default" {
+run "public_access_is_blocked_by_default" {
   command = plan
 
   assert {
     condition = alltrue([
       !output.s3_bucket_public_access_block.block_public_acls,
-      !output.s3_bucket_public_access_block.block_public_policy,
-      !output.s3_bucket_public_access_block.ignore_public_acls,
-      !output.s3_bucket_public_access_block.restrict_public_buckets,
+      output.s3_bucket_public_access_block.block_public_policy,
+      output.s3_bucket_public_access_block.ignore_public_acls,
+      output.s3_bucket_public_access_block.restrict_public_buckets,
     ])
-    error_message = "All four Block Public Access flags must be false by default"
+    error_message = "block_public_policy, ignore_public_acls and restrict_public_buckets must be true and block_public_acls false by default"
   }
 }
 
@@ -57,23 +58,5 @@ run "public_access_is_not_blocked_when_switched_off" {
       !output.s3_bucket_public_access_block.restrict_public_buckets,
     ])
     error_message = "All four Block Public Access flags must be false when bucket_block_public_access is false"
-  }
-}
-
-run "public_access_is_blocked_when_switched_on" {
-  command = plan
-
-  variables {
-    bucket_block_public_access = true
-  }
-
-  assert {
-    condition = alltrue([
-      !output.s3_bucket_public_access_block.block_public_acls,
-      output.s3_bucket_public_access_block.block_public_policy,
-      output.s3_bucket_public_access_block.ignore_public_acls,
-      output.s3_bucket_public_access_block.restrict_public_buckets,
-    ])
-    error_message = "block_public_policy, ignore_public_acls and restrict_public_buckets must be true and block_public_acls false when bucket_block_public_access is true"
   }
 }

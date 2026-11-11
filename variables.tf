@@ -41,12 +41,12 @@ variable "bucket_block_public_access" {
     Switches ignore_public_acls, block_public_policy and restrict_public_buckets of the bucket's S3 Block
     Public Access together. When true, S3 ignores every public object ACL (also on existing objects),
     refuses a public bucket policy and limits one attached outside Terraform to this account, so no public
-    access remains. When false, public-read object ACLs work again, which buckets need
-    while uploaders still send them or readers still use the resulting S3 URLs.
+    access remains. It is on by default. Set it to false on a bucket whose uploaders still send public-read
+    object ACLs or whose readers still use the resulting S3 URLs: S3 then honours public ACLs again.
     block_public_acls stays false either way: with it S3 rejects a public-read upload instead of ignoring it.
   EOT
   type        = bool
-  default     = false
+  default     = true
   nullable    = false
 }
 
