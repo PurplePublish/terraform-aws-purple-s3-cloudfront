@@ -41,15 +41,29 @@ data "aws_iam_policy_document" "bucket" {
   }
 }
 
-# Bucket content is served only through CloudFront. A public-read object ACL would bypass that: S3
-# evaluates ACLs separately from the bucket policy, so such an object is readable straight from
-# the S3 endpoint, without a signed URL. ignore_public_acls makes S3 disregard every public ACL, on
-# existing objects too. block_public_policy refuses a bucket policy that grants public access, and
-# restrict_public_buckets limits a public policy attached outside Terraform to this account. ACL
-# grants to specific AWS accounts are not public and still apply until ACLs are disabled.
+# Bucket content is meant to be served only through CloudFront. A public-read object ACL bypasses
+# that: S3 evaluates ACLs separately from the bucket policy, so such an object is readable straight
+# from the S3 endpoint, without a signed URL. With bucket_block_public_access, ignore_public_acls
+# makes S3 disregard every public ACL, on existing objects too, block_public_policy refuses a bucket
+# policy that grants public access, and restrict_public_buckets limits a public policy attached
+# outside Terraform to this account. ACL grants to specific AWS accounts are not public and still
+# apply until ACLs are disabled.
 #
 # block_public_acls stays false, and ACLs stay enabled (BucketOwnerPreferred), while uploaders
 # still send public-read: with either one S3 rejects those uploads instead of ignoring their ACL.
+#
+# bucket_block_public_access switches the three flags together and is on by default. Turning it off
+# gives the behaviour from before 0.4.0, public object ACLs honoured again, for buckets whose uploaders
+# still send public-read or whose readers still use the resulting S3 URLs.
+locals {
+  bucket_public_access_block = {
+    block_public_acls       = false
+    block_public_policy     = var.bucket_block_public_access
+    ignore_public_acls      = var.bucket_block_public_access
+    restrict_public_buckets = var.bucket_block_public_access
+  }
+}
+
 module "bucket" {
   source                   = "terraform-aws-modules/s3-bucket/aws"
   version                  = "5.10.0"
@@ -57,10 +71,10 @@ module "bucket" {
   bucket                   = var.bucket_name
   attach_policy            = true
   policy                   = data.aws_iam_policy_document.bucket.json
-  block_public_acls        = false
-  block_public_policy      = true
-  ignore_public_acls       = true
-  restrict_public_buckets  = true
+  block_public_acls        = local.bucket_public_access_block.block_public_acls
+  block_public_policy      = local.bucket_public_access_block.block_public_policy
+  ignore_public_acls       = local.bucket_public_access_block.ignore_public_acls
+  restrict_public_buckets  = local.bucket_public_access_block.restrict_public_buckets
   control_object_ownership = true
   object_ownership         = "BucketOwnerPreferred"
 

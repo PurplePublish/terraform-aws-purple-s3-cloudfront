@@ -1,6 +1,7 @@
 # Additional distributions are allowed to read the bucket through its policy. S3 treats a policy
 # whose AWS:SourceArn holds a wildcard or a policy variable as public, and the bucket's public access
-# block refuses it, so only exact distribution ARNs are accepted.
+# block refuses it once bucket_block_public_access is on, so only exact distribution ARNs are accepted
+# whatever the switch says.
 
 mock_provider "aws" {
   # The IAM resources validate their policy JSON, which a mocked string is not

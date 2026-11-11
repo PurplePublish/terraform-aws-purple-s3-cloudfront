@@ -28,11 +28,26 @@ variable "bucket_additional_cloudfront_arns" {
 
   validation {
     # S3 treats a bucket policy whose AWS:SourceArn holds a wildcard or a policy variable as public,
-    # and the bucket's public access block refuses it; anything else that is not a distribution ARN
-    # would match no distribution
+    # and the bucket's public access block refuses it once bucket_block_public_access is on. The rule
+    # applies whatever the switch says, so turning it on later cannot break the policy; anything else
+    # that is not a distribution ARN would match no distribution
     condition     = alltrue([for arn in var.bucket_additional_cloudfront_arns : can(regex("^arn:aws[a-z-]*:cloudfront::[0-9]{12}:distribution/[A-Z0-9]+$", arn))])
     error_message = "bucket_additional_cloudfront_arns must hold exact CloudFront distribution ARNs, without wildcards or policy variables."
   }
+}
+
+variable "bucket_block_public_access" {
+  description = <<-EOT
+    Switches ignore_public_acls, block_public_policy and restrict_public_buckets of the bucket's S3 Block
+    Public Access together. When true, S3 ignores every public object ACL (also on existing objects),
+    refuses a public bucket policy and limits one attached outside Terraform to this account, so no public
+    access remains. It is on by default. Set it to false on a bucket whose uploaders still send public-read
+    object ACLs or whose readers still use the resulting S3 URLs: S3 then honours public ACLs again.
+    block_public_acls stays false either way: with it S3 rejects a public-read upload instead of ignoring it.
+  EOT
+  type        = bool
+  default     = true
+  nullable    = false
 }
 
 variable "bucket_automatic_cleanup_enabled" {
