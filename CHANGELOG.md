@@ -9,7 +9,7 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
-## [Unreleased]
+## [0.5.0] - 2026-11-11
 ### Added
 - `bucket_block_public_access` switches `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` of
   the bucket together, and the `s3_bucket_public_access_block` output reports the flags as configured.
