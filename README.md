@@ -25,6 +25,16 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 * Following paths are publicly accessible:
     * \*/thumbnails/\*
     * /public/\*
+    * every prefix in `public_key_prefixes`, e.g. `team-1/public/` serves /team-1/public/\* (the
+      `cloudfront_unsigned_path_patterns` output lists all of them)
+* Objects under `public_key_prefixes` may also be read by every other CloudFront distribution of the bucket's
+  account through origin access control, so a distribution created outside this module (for example one serving a
+  website on its own domain) can deliver them with an S3 origin for this bucket. The grant is bound to the account
+  with `AWS:SourceAccount`, which keeps the bucket policy non-public. When such a distribution attaches the
+  Tachyon Lambda@Edge, its origin needs the `X-AWS-S3-REGION` and `X-AWS-S3-BUCKET` custom headers and no origin
+  path: Tachyon reads the object under the request path, so the URL path must be the object key. Route only the
+  `public_key_prefixes` path patterns to the bucket there: Tachyon reads originals with its own role, which may read
+  every object, so a resizing request on any other path would return a resized copy of a non-public object.
 
 ## Migration from manual setup
 

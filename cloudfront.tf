@@ -130,6 +130,7 @@ module "default_cloudfront" {
   cloudfront_cors_allow_origins       = var.cloudfront_cors_allow_origins
   cloudfront_tachyon_qualified_arn    = module.lambdas.tachyon_qualified_arn
   cloudfront_public_web               = var.cloudfront_public_web
+  cloudfront_public_path_patterns     = [for prefix in var.public_key_prefixes : "${prefix}*"]
   cloudfront_cache_policy_id          = aws_cloudfront_cache_policy.s3.id
   cloudfront_origin_request_policy_id = aws_cloudfront_origin_request_policy.s3.id
   cloudfront_key_group_id             = aws_cloudfront_key_group.default.id

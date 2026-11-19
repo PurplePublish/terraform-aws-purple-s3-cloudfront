@@ -18,6 +18,60 @@ locals {
   }
 }
 
+locals {
+  public_behaviors = [
+    merge(local.behavior_defaults, {
+      path_pattern     = "${var.bucket_prefix}public/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "${var.bucket_prefix}tts/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
+  ]
+
+  web_behaviors = [
+    merge(local.behavior_defaults, {
+      path_pattern     = "*.pkar/web/*"
+      target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
+    }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "*/web/*.pkar/*"
+      target_origin_id = "S3-${var.bucket_name}"
+
+      trusted_signers    = null
+      trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
+    }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "*/thumbnails/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
+    merge(local.behavior_defaults, {
+      path_pattern     = "thumbnails/*"
+      target_origin_id = "S3-${var.bucket_name}"
+    }),
+  ]
+
+  # Patterns that already have a behaviour are skipped: CloudFront rejects a distribution with two
+  # behaviours of the same path pattern.
+  fixed_path_patterns = [for behavior in concat(local.public_behaviors, local.web_behaviors) : behavior.path_pattern]
+  additional_public_behaviors = [
+    for pattern in distinct(var.cloudfront_public_path_patterns) : merge(local.behavior_defaults, {
+      path_pattern     = pattern
+      target_origin_id = "S3-${var.bucket_name}"
+    }) if !contains(local.fixed_path_patterns, pattern)
+  ]
+
+  # Behaviours without trusted_key_groups serve their path without a signed URL; the
+  # cloudfront_unsigned_path_patterns output is derived from that, so it cannot drift from them.
+  # The additional public paths come before the web package paths: the first matching behaviour
+  # wins, and a public object must not require a signature because its key also matches one of them.
+  ordered_cache_behaviors = concat(local.public_behaviors, local.additional_public_behaviors, local.web_behaviors)
+}
+
 resource "aws_cloudfront_response_headers_policy" "s3" {
   name = "${var.bucket_name}${var.cloudfront_postfix}"
   cors_config {
@@ -76,38 +130,7 @@ module "cloudfront" {
     trusted_signers    = null
     trusted_key_groups = [var.cloudfront_key_group_id]
   })
-  ordered_cache_behavior = [
-    merge(local.behavior_defaults, {
-      path_pattern     = "${var.bucket_prefix}public/*"
-      target_origin_id = "S3-${var.bucket_name}"
-    }),
-    merge(local.behavior_defaults, {
-      path_pattern     = "${var.bucket_prefix}tts/*"
-      target_origin_id = "S3-${var.bucket_name}"
-    }),
-    merge(local.behavior_defaults, {
-      path_pattern     = "*.pkar/web/*"
-      target_origin_id = "S3-${var.bucket_name}"
-
-      trusted_signers    = null
-      trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
-    }),
-    merge(local.behavior_defaults, {
-      path_pattern     = "*/web/*.pkar/*"
-      target_origin_id = "S3-${var.bucket_name}"
-
-      trusted_signers    = null
-      trusted_key_groups = var.cloudfront_public_web ? null : [var.cloudfront_key_group_id]
-    }),
-    merge(local.behavior_defaults, {
-      path_pattern     = "*/thumbnails/*"
-      target_origin_id = "S3-${var.bucket_name}"
-    }),
-    merge(local.behavior_defaults, {
-      path_pattern     = "thumbnails/*"
-      target_origin_id = "S3-${var.bucket_name}"
-    })
-  ]
+  ordered_cache_behavior = local.ordered_cache_behaviors
 
   viewer_certificate = var.cloudfront_domain != "" ? {
     acm_certificate_arn      = var.manage_certificate ? module.acm.acm_certificate_arn : var.acm_certificate_arn

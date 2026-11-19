@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "aws_iam_policy_document" "bucket" {
   statement {
     sid    = "AllowCloudFrontServicePrincipalReadOnly"
@@ -12,6 +14,37 @@ data "aws_iam_policy_document" "bucket" {
       test     = "StringEquals"
       variable = "AWS:SourceArn"
       values   = concat([module.default_cloudfront.cloudfront_distribution_arn], var.bucket_additional_cloudfront_arns)
+    }
+  }
+
+  # Public objects may be read by every CloudFront distribution of this account, so a distribution
+  # created outside this module can deliver them without its ARN being listed here. The condition
+  # uses the exact account rather than a wildcard distribution ARN: S3 treats a wildcard
+  # AWS:SourceArn as a public grant and the public access block refuses it, while a fixed
+  # AWS:SourceAccount keeps the policy non-public. Tachyon stores resized images under
+  # "resized/<key of the original>_<parameters>", which a resizing request is then served from.
+  # Unlike the module's own distribution, these get no s3:ListBucket: a distribution outside the
+  # module may route other paths to the bucket too, and would then serve listings of all its keys.
+  # A missing public object answers 403 there instead of 404.
+  dynamic "statement" {
+    for_each = length(var.public_key_prefixes) > 0 ? [1] : []
+    content {
+      sid    = "AllowAccountCloudFrontReadPublicKeys"
+      effect = "Allow"
+      principals {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+      actions = ["s3:GetObject"]
+      resources = flatten([for prefix in var.public_key_prefixes : [
+        "arn:aws:s3:::${var.bucket_name}/${prefix}*",
+        "arn:aws:s3:::${var.bucket_name}/resized/${prefix}*",
+      ]])
+      condition {
+        test     = "StringEquals"
+        variable = "AWS:SourceAccount"
+        values   = [data.aws_caller_identity.current.account_id]
+      }
     }
   }
 
