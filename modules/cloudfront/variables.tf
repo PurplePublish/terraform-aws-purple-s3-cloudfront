@@ -58,6 +58,13 @@ variable "cloudfront_public_web" {
   default = false
 }
 
+variable "cloudfront_public_path_patterns" {
+  description = "Additional path patterns served without a signed URL."
+  type        = list(string)
+  default     = []
+  nullable    = false
+}
+
 variable "cloudfront_postfix" {
   type    = string
   default = ""

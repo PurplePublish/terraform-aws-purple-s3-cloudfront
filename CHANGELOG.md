@@ -9,6 +9,18 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
+## [Unreleased]
+### Added
+- `public_key_prefixes` lists key prefixes of public objects, e.g. `public/assets/team-1/`. The module's distribution serves
+  them without a signed URL, and every CloudFront distribution of the bucket's account may read them, and their
+  Tachyon-resized copies under `resized/`, through origin access control. Another distribution of the account, for
+  example one serving a website on its own domain, can then deliver these objects without its ARN being known to the
+  module. Those distributions get no listing permission, so a missing object answers 403 there. The grant is bound
+  to the exact account (`AWS:SourceAccount`), so the bucket policy stays non-public and is accepted with
+  `bucket_block_public_access` on. Prefixes are matched literally; wildcards are rejected. Each prefix adds a
+  cache behaviour, unless the built-in `public/*` or `tts/*` behaviour already serves it.
+- `cloudfront_unsigned_path_patterns` output: the path patterns the distribution serves without a signed URL.
+
 ## [0.5.0] - 2026-11-11
 ### Added
 - `bucket_block_public_access` switches `ignore_public_acls`, `block_public_policy` and `restrict_public_buckets` of

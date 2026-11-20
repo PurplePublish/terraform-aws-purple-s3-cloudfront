@@ -59,6 +59,11 @@ output "cloudfront_distribution_arn" {
   value = module.default_cloudfront.cloudfront_distribution_arn
 }
 
+output "cloudfront_unsigned_path_patterns" {
+  description = "Path patterns the distribution serves without a signed URL, public_key_prefixes included"
+  value       = module.default_cloudfront.cloudfront_unsigned_path_patterns
+}
+
 output "cloudfront_distribution_domain_name" {
   value = module.default_cloudfront.cloudfront_distribution_domain_name
 }

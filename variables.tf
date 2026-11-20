@@ -36,6 +36,37 @@ variable "bucket_additional_cloudfront_arns" {
   }
 }
 
+variable "public_key_prefixes" {
+  description = <<-EOT
+    Key prefixes of public objects, each ending in "/" and without a leading "/", e.g. "team-1/public/".
+    The module's distribution serves them without a signed URL, and every CloudFront distribution of the
+    bucket's account may read them through origin access control, together with the resized copies the
+    Tachyon Lambda@Edge stores under "resized/". This lets another distribution of the account, for
+    example one that serves a website on its own domain, deliver these objects without its ARN being
+    known to this module. Prefixes are matched literally, so the grant stays limited to exactly these
+    prefixes; "resized/" is not allowed, as it would expose the resized copies of every object. Each
+    prefix adds a cache behaviour, which counts against the distribution's CloudFront quota.
+  EOT
+  type        = list(string)
+  default     = []
+  nullable    = false
+
+  validation {
+    # A wildcard would widen the grant beyond the prefix the caller named; a leading "/" or a missing
+    # trailing "/" would make the path pattern and the policy resource match other keys than intended.
+    # Only characters CloudFront accepts in a path pattern, so plan already rejects what apply would.
+    condition = alltrue([
+      for prefix in var.public_key_prefixes :
+      can(regex("^[A-Za-z0-9_.~-][A-Za-z0-9_.~/-]*/$", prefix)) && !startswith(prefix, "resized/") &&
+      # Viewers collapse dot and empty segments, so such a pattern never matches a request, while the
+      # grant would cover those literal keys; CloudFront limits a path pattern to 255 characters
+      !can(regex("(^|/)\\.{1,2}/|//", prefix)) && length(prefix) < 255
+    ])
+    error_message = "public_key_prefixes must hold key prefixes shorter than 255 characters, of letters, digits and _ . ~ - / ending in \"/\", without a leading \"/\", without empty, \".\" or \"..\" segments, and not under \"resized/\"."
+  }
+
+}
+
 variable "bucket_block_public_access" {
   description = <<-EOT
     Switches ignore_public_acls, block_public_policy and restrict_public_buckets of the bucket's S3 Block

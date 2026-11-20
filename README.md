@@ -25,6 +25,22 @@ It optionally supports a custom domain setup for Cloudfront, e.g. cdn.example.co
 * Following paths are publicly accessible:
     * \*/thumbnails/\*
     * /public/\*
+    * every prefix in `public_key_prefixes`, e.g. `team-1/assets/` serves /team-1/assets/\* (the
+      `cloudfront_unsigned_path_patterns` output lists all of them). A prefix under /public/ or /tts/, such as
+      `public/assets/team-1/`, is already served by that behaviour and gets no behaviour of its own
+* Objects under `public_key_prefixes` may also be read by every other CloudFront distribution of the bucket's
+  account through origin access control, so a distribution created outside this module (for example one serving a
+  website on its own domain) can deliver them with an S3 origin for this bucket. The grant is bound to the account
+  with `AWS:SourceAccount`, which keeps the bucket policy non-public. When such a distribution attaches the
+  Tachyon Lambda@Edge, its origin needs the `X-AWS-S3-REGION` and `X-AWS-S3-BUCKET` custom headers and no origin
+  path: Tachyon reads the object under the request path, so the URL path must be the object key. Route only the
+  `public_key_prefixes` path patterns to the bucket there. Tachyon reads the original with its own role, stores the
+  resized copy under `resized/` and has CloudFront fetch that copy through origin access control, which the grant
+  only allows for `resized/<prefix>*`: a resizing request on any other path answers 403 after Tachyon has already
+  resized and stored a copy, so routing it only costs Lambda time and S3 writes.
+* Other components may look this grant up in the bucket policy to tell whether the module already grants the
+  public prefixes: by its Sid `AllowAccountCloudFrontReadPublicKeys` and its resource ARNs
+  `arn:aws:s3:::<bucket>/<prefix>*`. Treat both as part of the module's interface.
 
 ## Migration from manual setup
 
