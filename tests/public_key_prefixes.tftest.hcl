@@ -93,12 +93,41 @@ run "duplicate_and_built_in_public_key_prefixes_get_one_behaviour" {
   }
 }
 
+run "public_key_prefixes_under_a_built_in_public_behaviour_get_no_behaviour_but_the_grant" {
+  command = plan
+
+  variables {
+    public_key_prefixes = ["public/assets/team-1/", "tts/team-1/"]
+  }
+
+  assert {
+    # public/* and tts/* come first and already serve them unsigned
+    condition = output.cloudfront_unsigned_path_patterns == [
+      "public/*",
+      "tts/*",
+      "*/thumbnails/*",
+      "thumbnails/*",
+    ]
+    error_message = "A prefix a built-in public behaviour serves must not use up another behaviour"
+  }
+
+  assert {
+    condition = one([for s in data.aws_iam_policy_document.bucket.statement : s if s.sid == "AllowAccountCloudFrontReadPublicKeys"]).resources == toset([
+      "arn:aws:s3:::purple-files-test/public/assets/team-1/*",
+      "arn:aws:s3:::purple-files-test/resized/public/assets/team-1/*",
+      "arn:aws:s3:::purple-files-test/tts/team-1/*",
+      "arn:aws:s3:::purple-files-test/resized/tts/team-1/*",
+    ])
+    error_message = "Prefixes without a behaviour of their own are still granted to the account's distributions"
+  }
+}
+
 run "public_key_prefix_equal_to_a_built_in_pattern_with_bucket_prefix_gets_one_behaviour" {
   command = plan
 
   variables {
     bucket_prefix       = "x/"
-    public_key_prefixes = ["x/public/", "public/"]
+    public_key_prefixes = ["x/public/", "public/", "x/public/assets/team-1/"]
   }
 
   assert {
@@ -109,7 +138,7 @@ run "public_key_prefix_equal_to_a_built_in_pattern_with_bucket_prefix_gets_one_b
       "*/thumbnails/*",
       "thumbnails/*",
     ]
-    error_message = "Only a prefix equal to a built-in pattern, bucket_prefix included, is skipped"
+    error_message = "Only prefixes a built-in pattern serves, bucket_prefix included, are skipped"
   }
 }
 
@@ -177,13 +206,13 @@ run "public_key_prefixes_are_readable_by_distributions_of_the_account" {
   command = plan
 
   variables {
-    public_key_prefixes = ["team-1/public/"]
+    public_key_prefixes = ["public/assets/team-1/"]
   }
 
   assert {
     condition = one([for s in data.aws_iam_policy_document.bucket.statement : s if s.sid == "AllowAccountCloudFrontReadPublicKeys"]).resources == toset([
-      "arn:aws:s3:::purple-files-test/team-1/public/*",
-      "arn:aws:s3:::purple-files-test/resized/team-1/public/*",
+      "arn:aws:s3:::purple-files-test/public/assets/team-1/*",
+      "arn:aws:s3:::purple-files-test/resized/public/assets/team-1/*",
     ])
     error_message = "The grant must cover the public objects and their resized copies, and nothing else"
   }

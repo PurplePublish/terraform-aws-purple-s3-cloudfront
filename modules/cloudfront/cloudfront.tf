@@ -56,13 +56,16 @@ locals {
   ]
 
   # Patterns that already have a behaviour are skipped: CloudFront rejects a distribution with two
-  # behaviours of the same path pattern.
+  # behaviours of the same path pattern. So are prefixes a built-in public behaviour already serves
+  # unsigned, such as "public/assets/team-1/" under "public/*": that behaviour comes first and
+  # matches them anyway, and another one would only use up the distribution's behaviour quota.
   fixed_path_patterns = [for behavior in concat(local.public_behaviors, local.web_behaviors) : behavior.path_pattern]
+  public_key_roots    = [for behavior in local.public_behaviors : trimsuffix(behavior.path_pattern, "*")]
   additional_public_behaviors = [
     for pattern in distinct(var.cloudfront_public_path_patterns) : merge(local.behavior_defaults, {
       path_pattern     = pattern
       target_origin_id = "S3-${var.bucket_name}"
-    }) if !contains(local.fixed_path_patterns, pattern)
+    }) if !contains(local.fixed_path_patterns, pattern) && !anytrue([for root in local.public_key_roots : startswith(pattern, root)])
   ]
 
   # Behaviours without trusted_key_groups serve their path without a signed URL; the
