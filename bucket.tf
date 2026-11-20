@@ -26,6 +26,11 @@ data "aws_iam_policy_document" "bucket" {
   # Unlike the module's own distribution, these get no s3:ListBucket: a distribution outside the
   # module may route other paths to the bucket too, and would then serve listings of all its keys.
   # A missing public object answers 403 there instead of 404.
+  #
+  # The Sid and the resource ARN format are an interface: consumers outside this module read the
+  # bucket policy to tell whether the account already grants the public prefixes, matching this
+  # Sid and "arn:aws:s3:::<bucket>/<prefix>*". Renaming the Sid, splitting the statement or
+  # changing the ARN shape makes them treat the account as not granted.
   dynamic "statement" {
     for_each = length(var.public_key_prefixes) > 0 ? [1] : []
     content {
