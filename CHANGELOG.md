@@ -9,7 +9,7 @@ Entries are derived from the Git tags of this repository.
 > Note: releases up to `v0.0.39` were tagged with a `v` prefix; from `0.0.40`
 > onward the prefix was dropped.
 
-## [Unreleased]
+## [0.6.0] - 2026-11-20
 ### Added
 - `public_key_prefixes` lists key prefixes of public objects, e.g. `public/assets/team-1/`. The module's distribution serves
   them without a signed URL, and every CloudFront distribution of the bucket's account may read them, and their
